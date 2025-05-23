@@ -317,6 +317,49 @@ async def support(interaction: discord.Interaction):
     embed.add_field(name="招待リンク", value="https://discord.gg/Yv9uJ32KkT")
     await interaction.response.send_message(embed=embed)
 
+@bot.tree.command(name="help", description="コマンドの詳細を表示します。")
+async def help_command(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="コマンド一覧",
+        description="Botで使用できるコマンドの概要です。",
+        color=discord.Color.green()
+    )
+
+    embed.add_field(
+        name="■ 管理者専用",
+        value=(
+            "`/add_whitelist` - コマンド許可ロールを追加\n"
+            "`/whitelist` - 許可ロール一覧を表示\n"
+            "`/delete_whitelist` - 許可ロールを削除"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="■ 管理者 + 許可ロール",
+        value=(
+            "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
+            "`/add_announcement_list` - アナウンスチャンネルを追加\n"
+            "`/announcement_list` - アナウンスチャンネル一覧を表示\n"
+            "`/delete_announcement_list` - アナウンスチャンネルを削除"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="■ 全ユーザー利用可",
+        value=(
+            "`/server_information` - サーバー情報を表示\n"
+            "`/user_information` - ユーザー情報を表示\n"
+            "`/support` - サポートサーバーの招待リンクを表示\n"
+            "`/help` - このヘルプメッセージを表示"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text="必要に応じて権限が制限されています。")
+    await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
+
 @bot.event
 async def on_message(message):
     try:
