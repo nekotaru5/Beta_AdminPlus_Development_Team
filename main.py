@@ -163,7 +163,7 @@ async def show_whitelist(interaction: discord.Interaction):
     await interaction.response.send_message("許可ロール:\n" + "\n".join(roles), ephemeral=True)
 
 # アナウンスチャンネル管理コマンド
-@bot.tree.command(name="add_announcement_list", description="アナウンスチャンネルを追加します")
+@bot.tree.command(name="add_announcement_list", description="自動アナウンス公開リストにチャンネルを追加します。")
 @app_commands.describe(channel="追加するチャンネル")
 async def add_announcement_list(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
@@ -177,11 +177,11 @@ async def add_announcement_list(interaction: discord.Interaction, channel: disco
     if channel.id not in announcement_channels[guild_id]:
         announcement_channels[guild_id].append(channel.id)
         save_announcement_channels()
-        await interaction.response.send_message(f"{channel.mention} をアナウンスチャンネルに追加しました", ephemeral=True)
+        await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストに追加しました", ephemeral=True)
     else:
-        await interaction.response.send_message(f"{channel.mention} は既にアナウンスチャンネルです", ephemeral=True)
+        await interaction.response.send_message(f"{channel.mention} は既に自動アナウンス公開リストにあります。", ephemeral=True)
 
-@bot.tree.command(name="announcement_list", description="アナウンスチャンネルを表示します")
+@bot.tree.command(name="announcement_list", description="自動アナウンス公開リストを表示します")
 async def announcement_list(interaction: discord.Interaction):
     if not await check_permissions(interaction):
         await interaction.response.send_message("このコマンドを実行する権限がありません", ephemeral=True)
@@ -189,13 +189,13 @@ async def announcement_list(interaction: discord.Interaction):
 
     guild_id = str(interaction.guild_id)
     if guild_id not in announcement_channels or not announcement_channels[guild_id]:
-        await interaction.response.send_message("アナウンスチャンネルは設定されていません", ephemeral=True)
+        await interaction.response.send_message("自動アナウンス公開リストにチャンネルはありません。", ephemeral=True)
         return
 
     channels = [f"<#{channel_id}>" for channel_id in announcement_channels[guild_id]]
     await interaction.response.send_message("アナウンスチャンネル:\n" + "\n".join(channels), ephemeral=True)
 
-@bot.tree.command(name="delete_announcement_list", description="アナウンスチャンネルを削除します")
+@bot.tree.command(name="delete_announcement_list", description="自動アナウンス公開リストからチャンネルを削除します。")
 @app_commands.describe(channel="削除するチャンネル")
 async def delete_announcement_list(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
@@ -206,9 +206,9 @@ async def delete_announcement_list(interaction: discord.Interaction, channel: di
     if guild_id in announcement_channels and channel.id in announcement_channels[guild_id]:
         announcement_channels[guild_id].remove(channel.id)
         save_announcement_channels()
-        await interaction.response.send_message(f"{channel.mention} をアナウンスチャンネルから削除しました", ephemeral=True)
+        await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストから削除しました", ephemeral=True)
     else:
-        await interaction.response.send_message(f"{channel.mention} はアナウンスチャンネルではありません", ephemeral=True)
+        await interaction.response.send_message(f"{channel.mention} は自動アナウンス公開リストに含まれていません。", ephemeral=True)
 
 # その他のコマンド
 @bot.tree.command(name="user_information", description="ユーザーの情報を表示します")
