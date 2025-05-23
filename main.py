@@ -329,8 +329,8 @@ async def help_command(interaction: discord.Interaction):
         name="■ 管理者専用",
         value=(
             "`/add_whitelist` - コマンド許可ロールを追加\n"
-            "`/whitelist` - 許可ロール一覧を表示\n"
-            "`/delete_whitelist` - 許可ロールを削除"
+            "`/whitelist` - コマンド許可ロール一覧を表示\n"
+            "`/delete_whitelist` - コマンド許可ロールを削除"
         ),
         inline=False
     )
@@ -339,9 +339,9 @@ async def help_command(interaction: discord.Interaction):
         name="■ 管理者 + 許可ロール",
         value=(
             "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
-            "`/add_announcement_list` - アナウンスチャンネルを追加\n"
-            "`/announcement_list` - アナウンスチャンネル一覧を表示\n"
-            "`/delete_announcement_list` - アナウンスチャンネルを削除"
+            "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
+            "`/announcement_list` - 自動アナウンス公開リストを表示\n"
+            "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除"
         ),
         inline=False
     )
@@ -352,7 +352,7 @@ async def help_command(interaction: discord.Interaction):
             "`/server_information` - サーバー情報を表示\n"
             "`/user_information` - ユーザー情報を表示\n"
             "`/support` - サポートサーバーの招待リンクを表示\n"
-            "`/help` - このヘルプメッセージを表示"
+            "`/help` - コマンドの詳細を表示"
         ),
         inline=False
     )
