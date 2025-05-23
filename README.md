@@ -1,6 +1,6 @@
 ご利用にあたって
 
-Corebotをご利用いただきありがとうございます。
+AdminPlusをご利用いただきありがとうございます。
 以下のガイドラインに同意のうえ、ご使用ください。
 
 使用は自由ですが、以下の行為は禁止です：
@@ -26,7 +26,7 @@ https://discord.gg/Yv9uJ32KkT
 
 Terms of Use
 
-Thank you for using Corebot.
+Thank you for using AdminPlus.
 By using this bot, you agree to the following terms:
 
 You're free to use the bot, but the following are strictly prohibited:
