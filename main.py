@@ -357,7 +357,7 @@ async def help_command(interaction: discord.Interaction):
         inline=False
     )
 
-    embed.set_footer(text="必要に応じて権限が制限されています。")
+    embed.set_footer(text="ご不明点等がございましたら、サポートサーバーに問い合わせてください。")
     await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
 
 @bot.event
