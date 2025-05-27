@@ -80,11 +80,8 @@ async def on_ready():
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
 
-    # ステータスを「配信中」に設定（LIVE表示つき）
-    activity = discord.Streaming(
-        name="nekotaru5の配信を視聴中",
-        url="https://www.youtube.com/@nekotaru5/live"  # ← YouTubeライブURL！
-    )
+    # ステータスを「視聴中 nekotaru5」に設定
+    activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeChを視聴中")
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
     try:
