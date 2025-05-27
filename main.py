@@ -94,7 +94,7 @@ async def on_ready():
 
 @bot.command()
 async def Admin(ctx):
-    await ctx.send('呼びましたか?')
+    await ctx.send('呼びましたか？(⁎˃ᴗ˂⁎)')
 
 # ホワイトリスト管理コマンド
 @bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
