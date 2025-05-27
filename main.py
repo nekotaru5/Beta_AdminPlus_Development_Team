@@ -89,7 +89,6 @@ async def on_ready():
         print("コマンドを同期しました")
     except Exception as e:
         print(f"コマンドの同期に失敗: {e}")
-    
     print(f"{bot.user} としてログインしました")ログインしました")
 
 # ホワイトリスト管理コマンド
