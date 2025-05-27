@@ -81,7 +81,7 @@ async def on_ready():
     announcement_channels = load_announcement_channels()
     
     # ステータスを「視聴中 nekotaru5」に設定
-    activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeを視聴中")
+    activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeChを視聴中")
     await bot.change_presence(status=discord.Status.online, activity=activity)
     
     try:
