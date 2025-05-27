@@ -79,17 +79,20 @@ async def on_ready():
     global allowed_roles, announcement_channels
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
-    
-    # ステータスを「視聴中 nekotaru5」に設定
-    activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeChを視聴中")
+
+    # ステータスを「配信中」に設定（LIVE表示つき）
+    activity = discord.Streaming(
+        name="nekotaru5の配信を視聴中",
+        url="https://www.youtube.com/@nekotaru5/live"  # ← YouTubeライブURL！
+    )
     await bot.change_presence(status=discord.Status.online, activity=activity)
-    
+
     try:
         await bot.tree.sync()
         print("コマンドを同期しました")
     except Exception as e:
         print(f"コマンドの同期に失敗: {e}")
-    
+
     print(f"{bot.user} としてログインしました")
 
 # ホワイトリスト管理コマンド
