@@ -90,7 +90,7 @@ async def on_ready():
     except Exception as e:
         print(f"コマンドの同期に失敗: {e}")
     
-　　　　　print(f"{bot.user} としてログインしました")
+    print(f"{bot.user} としてログインしました")
 
 # ホワイトリスト管理コマンド
 @bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
