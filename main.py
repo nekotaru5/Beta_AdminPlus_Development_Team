@@ -127,7 +127,7 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
     if role.id not in allowed_roles[guild_id]:
         allowed_roles[guild_id].append(role.id)
         save_allowed_roles()
-        print(f"[{guild_id}] でロールID {role.id} が追加されました")  # ← ここ追加
+        print(f"[{guild_id}] でロール {role.id} が追加されました")  # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールに追加しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は既に許可ロールです", ephemeral=True)
@@ -150,10 +150,11 @@ async def delete_whitelist(interaction: discord.Interaction, role: discord.Role)
     if guild_id in allowed_roles and role.id in allowed_roles[guild_id]:
         allowed_roles[guild_id].remove(role.id)
         save_allowed_roles()
-        print(f"[{guild_id}] でロールID {role.id} が削除されました")  # ← ここ追加
+        print(f"[{guild_id}] でロール {role.id} が削除されました")  # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は許可ロールではありません", ephemeral=True)
+
 @bot.tree.command(name="whitelist", description="許可ロールを表示します")
 async def show_whitelist(interaction: discord.Interaction):
     try:
