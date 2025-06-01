@@ -184,7 +184,6 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
     try:
         member = await interaction.guild.fetch_member(interaction.user.id)
         if not member.guild_permissions.administrator:
-            # 許可ロールチェック
             guild_id = str(interaction.guild_id)
             allowed = allowed_roles.get(guild_id, [])
             if not any(role.id in allowed for role in member.roles):
@@ -195,23 +194,23 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
-guild_id = str(interaction.guild_id)
-existing_channel_id = birthday_channels.get(guild_id)
+    guild_id = str(interaction.guild_id)
+    existing_channel_id = birthday_channels.get(guild_id)
 
-if existing_channel_id == channel.id:
-    del birthday_channels[guild_id]
-    save_birthday_channels()
-    await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
-    print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
-else:
-    if existing_channel_id is not None:
-        print(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
+    if existing_channel_id == channel.id:
+        del birthday_channels[guild_id]
+        save_birthday_channels()
+        await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
+        print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
     else:
-        print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
+        if existing_channel_id is not None:
+            print(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
+        else:
+            print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
 
-    birthday_channels[guild_id] = channel.id
-    save_birthday_channels()
-    await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルに登録しました。", ephemeral=True)
+        birthday_channels[guild_id] = channel.id
+        save_birthday_channels()
+        await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルに登録しました。", ephemeral=True)
 
 @bot.tree.command(name="add_birthdaylist", description="誕生日を登録します")
 @app_commands.describe(user="登録するユーザー", birthday="誕生日 (YYYY-MM-DD)")
