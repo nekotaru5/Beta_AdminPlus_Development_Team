@@ -24,26 +24,6 @@ class ServerInfo(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-@tasks.loop(minutes=1)
-async def check_birthdays():
-    now = datetime.now(timezone(timedelta(hours=9)))  # JST
-    # 午後12時（正午）の00分ちょうどに実行
-    if now.hour == 12 and now.minute == 0:
-        today = now.strftime("%m-%d")
-        for user_id, birth_date in birthday_list.items():
-            if birth_date[5:] == today:
-                user = await bot.fetch_user(int(user_id))
-                for guild_id, channel_id in birthday_channels.items():
-                    channel = bot.get_channel(channel_id)
-                    if channel:
-                        await channel.send(f"🎉 {user.mention} さん、お誕生日おめでとうございます！ 🎉")
-                        print(f"[{guild_id}] にて {user.id} の誕生日を祝いました")
-
-@check_birthdays.before_loop
-async def before_birthday_check():
-    await bot.wait_until_ready()
-
-check_birthdays.start()
 
 
 # 許可ロールの管理
@@ -128,11 +108,12 @@ async def check_permissions(interaction: discord.Interaction):
 
 @bot.event
 async def on_ready():
-    global allowed_roles, announcement_channels
+    global allowed_roles, announcement_channels, birthday_list, birthday_channels
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
+    birthday_list = load_birthday_list()
+    birthday_channels = load_birthday_channels()
 
-    # ステータスを「視聴中 nekotaru5」に設定
     activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeChを視聴中")
     await bot.change_presence(status=discord.Status.online, activity=activity)
 
@@ -143,6 +124,32 @@ async def on_ready():
         print(f"コマンドの同期に失敗: {e}")
 
     print(f"{bot.user} としてログインしました")
+
+    if not check_birthdays.is_running():
+        check_birthdays.start()
+
+@tasks.loop(minutes=1)
+async def check_birthdays():
+    now = datetime.now(timezone(timedelta(hours=9)))  # JST
+    # 午後12時（正午）の00分ちょうどに実行
+    if now.hour == 12 and now.minute == 0:
+        today = now.strftime("%m-%d")
+        for user_id, birth_date in birthday_list.items():
+            if birth_date[5:] == today:
+                user = await bot.fetch_user(int(user_id))
+                for guild_id, channel_id in birthday_channels.items():
+                    channel = bot.get_channel(channel_id)
+                    if channel:
+                        await channel.send(f"🎉 {user.mention} さん、お誕生日おめでとうございます！ 🎉")
+                        print(f"[{guild_id}] にて {user.id} の誕生日を祝いました")
+
+@check_birthdays.before_loop
+async def before_birthday_check():
+    await bot.wait_until_ready()
+
+check_birthdays.start()
+
+
 
 @bot.command()
 async def Admin(ctx):
