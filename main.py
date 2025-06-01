@@ -190,7 +190,6 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
         return
 
     try:
-        # フォーマット確認（YYYY-MM-DD）
         datetime.strptime(birthday, "%Y-%m-%d")
     except ValueError:
         await interaction.response.send_message("誕生日の形式が正しくありません。YYYY-MM-DD で入力してください。", ephemeral=True)
@@ -199,6 +198,7 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
     birthday_list[str(user.id)] = birthday
     save_birthday_list()
     await interaction.response.send_message(f"{user.mention} の誕生日を {birthday} に登録しました。", ephemeral=True)
+    print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
 
 @bot.tree.command(name="delete_birthdaylist", description="誕生日を削除します")
 @app_commands.describe(user="削除するユーザー")
@@ -211,6 +211,7 @@ async def delete_birthdaylist(interaction: discord.Interaction, user: discord.Us
         del birthday_list[str(user.id)]
         save_birthday_list()
         await interaction.response.send_message(f"{user.mention} の誕生日を削除しました。", ephemeral=True)
+        print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
     else:
         await interaction.response.send_message(f"{user.mention} は誕生日リストに登録されていません。", ephemeral=True)
 
