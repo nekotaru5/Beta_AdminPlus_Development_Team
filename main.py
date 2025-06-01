@@ -190,9 +190,11 @@ async def add_announcement_list(interaction: discord.Interaction, channel: disco
     if channel.id not in announcement_channels[guild_id]:
         announcement_channels[guild_id].append(channel.id)
         save_announcement_channels()
+        print(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストに追加されました")  # ← 追加
         await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストに追加しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{channel.mention} は既に自動アナウンス公開リストにあります。", ephemeral=True)
+
 
 @bot.tree.command(name="delete_announcement_list", description="自動アナウンス公開リストからチャンネルを削除します。")
 @app_commands.describe(channel="削除するチャンネル")
@@ -205,6 +207,7 @@ async def delete_announcement_list(interaction: discord.Interaction, channel: di
     if guild_id in announcement_channels and channel.id in announcement_channels[guild_id]:
         announcement_channels[guild_id].remove(channel.id)
         save_announcement_channels()
+        print(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました")  # ← 追加
         await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{channel.mention} は自動アナウンス公開リストに含まれていません。", ephemeral=True)
