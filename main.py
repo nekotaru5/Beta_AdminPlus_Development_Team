@@ -170,16 +170,17 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
-    # 登録 or 解除処理
     guild_id = str(interaction.guild_id)
     if birthday_channels.get(guild_id) == channel.id:
         del birthday_channels[guild_id]
         save_birthday_channels()
         await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
+        print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
     else:
         birthday_channels[guild_id] = channel.id
         save_birthday_channels()
         await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルに登録しました。", ephemeral=True)
+        print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
 
 @bot.tree.command(name="add_birthdaylist", description="誕生日を登録します")
 @app_commands.describe(user="登録するユーザー", birthday="誕生日 (YYYY-MM-DD)")
