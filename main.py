@@ -124,8 +124,7 @@ async def check_birthdays():
 async def before_birthday_check():
     await bot.wait_until_ready()
 
-check_birthdays.start()
-
+# ←ここで呼ばずに、
 
 @bot.event
 async def on_ready():
@@ -134,6 +133,9 @@ async def on_ready():
     announcement_channels = load_announcement_channels()
     birthday_list = load_birthday_list()
     birthday_channels = load_birthday_channels()
+
+    if not check_birthdays.is_running():  # ここで起動
+        check_birthdays.start()
 
     activity = discord.Activity(type=discord.ActivityType.watching, name="nekotaru5のYouTubeChを視聴中")
     await bot.change_presence(status=discord.Status.online, activity=activity)
@@ -145,10 +147,6 @@ async def on_ready():
         print(f"コマンドの同期に失敗: {e}")
 
     print(f"{bot.user} としてログインしました")
-
-    if not check_birthdays.is_running():
-        check_birthdays.start()
-
 
 @bot.command()
 async def Admin(ctx):
