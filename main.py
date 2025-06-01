@@ -24,6 +24,35 @@ class ServerInfo(commands.Cog):
         self.bot = bot
 
 # 許可ロールの管理
+# 誕生日リスト（ユーザーID: "YYYY-MM-DD"）
+birthday_list = {}
+
+def load_birthday_list():
+    try:
+        with open("BirthdayList.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[BirthdayList] 読み込みエラー: {e}")
+        return {}
+
+def save_birthday_list():
+    with open("BirthdayList.json", "w") as f:
+        json.dump(birthday_list, f, indent=4)
+# 誕生日アナウンスチャンネル（ギルドID: チャンネルID）
+birthday_channels = {}
+
+def load_birthday_channels():
+    try:
+        with open("Birthdaynotification.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[Birthdaynotification] 読み込みエラー: {e}")
+        return {}
+
+def save_birthday_channels():
+    with open("Birthdaynotification.json", "w") as f:
+        json.dump(birthday_channels, f, indent=4)
+
 allowed_roles = {}
 
 def load_allowed_roles():
@@ -95,6 +124,81 @@ async def on_ready():
 @bot.command()
 async def Admin(ctx):
     await ctx.send('呼びましたか？(⁎˃ᴗ˂⁎)')
+
+#　誕生日管理コマンド
+@bot.tree.command(name="setbirthdaych", description="誕生日アナウンス用チャンネルを登録または解除します")
+@app_commands.describe(channel="誕生日アナウンスを行うチャンネル")
+async def set_birthday_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    try:
+        member = await interaction.guild.fetch_member(interaction.user.id)
+        if not member.guild_permissions.administrator:
+            # 許可ロールチェック
+            guild_id = str(interaction.guild_id)
+            allowed = allowed_roles.get(guild_id, [])
+            if not any(role.id in allowed for role in member.roles):
+                await interaction.response.send_message("このコマンドは管理者または許可ロールのみ使用できます。", ephemeral=True)
+                return
+    except Exception as e:
+        print(f"[setbirthdaych] 権限チェックエラー: {e}")
+        await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
+        return
+
+    # 登録 or 解除処理
+    guild_id = str(interaction.guild_id)
+    if birthday_channels.get(guild_id) == channel.id:
+        del birthday_channels[guild_id]
+        save_birthday_channels()
+        await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
+    else:
+        birthday_channels[guild_id] = channel.id
+        save_birthday_channels()
+        await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルに登録しました。", ephemeral=True)
+
+@bot.tree.command(name="add_birthdaylist", description="誕生日を登録します")
+@app_commands.describe(user="登録するユーザー", birthday="誕生日 (YYYY-MM-DD)")
+async def add_birthdaylist(interaction: discord.Interaction, user: discord.User, birthday: str):
+    if not await can_modify_birthday(interaction, user.id):
+        await interaction.response.send_message("このユーザーの誕生日を登録する権限がありません。", ephemeral=True)
+        return
+
+    try:
+        # フォーマット確認（YYYY-MM-DD）
+        datetime.strptime(birthday, "%Y-%m-%d")
+    except ValueError:
+        await interaction.response.send_message("誕生日の形式が正しくありません。YYYY-MM-DD で入力してください。", ephemeral=True)
+        return
+
+    birthday_list[str(user.id)] = birthday
+    save_birthday_list()
+    await interaction.response.send_message(f"{user.mention} の誕生日を {birthday} に登録しました。", ephemeral=True)
+
+@bot.tree.command(name="delete_birthdaylist", description="誕生日を削除します")
+@app_commands.describe(user="削除するユーザー")
+async def delete_birthdaylist(interaction: discord.Interaction, user: discord.User):
+    if not await can_modify_birthday(interaction, user.id):
+        await interaction.response.send_message("このユーザーの誕生日を削除する権限がありません。", ephemeral=True)
+        return
+
+    if str(user.id) in birthday_list:
+        del birthday_list[str(user.id)]
+        save_birthday_list()
+        await interaction.response.send_message(f"{user.mention} の誕生日を削除しました。", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"{user.mention} は誕生日リストに登録されていません。", ephemeral=True)
+
+@bot.tree.command(name="birthday_list", description="登録されている誕生日リストを表示します")
+async def show_birthday_list(interaction: discord.Interaction):
+    if not birthday_list:
+        await interaction.response.send_message("誕生日リストは空です。", ephemeral=True)
+        return
+
+    message = "**🎂 登録済みの誕生日一覧 🎂**\n"
+    for user_id, birthday in birthday_list.items():
+        user = await bot.fetch_user(int(user_id))
+        message += f"{user.mention} - {birthday}\n"
+
+    await interaction.response.send_message(message, ephemeral=True)
+
 
 # ホワイトリスト管理コマンド
 @bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
@@ -381,6 +485,26 @@ async def help_command(interaction: discord.Interaction):
 
     embed.set_footer(text="ご不明点等がございましたら、サポートサーバーに問い合わせてください。")
     await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
+
+@tasks.loop(hours=24)
+async def check_birthdays():
+    now = datetime.now(timezone(timedelta(hours=9)))  # JST
+    today = now.strftime("%m-%d")
+
+    for user_id, birth_date in birthday_list.items():
+        if birth_date[5:] == today:
+            user = await bot.fetch_user(int(user_id))
+            for guild_id, channel_id in birthday_channels.items():
+                channel = bot.get_channel(channel_id)
+                if channel:
+                    await channel.send(f"🎉 {user.mention} さん、お誕生日おめでとうございます！ 🎉")
+                    print(f"[{guild_id}] にて {user.id} の誕生日を祝いました")
+
+@check_birthdays.before_loop
+async def before_birthday_check():
+    await bot.wait_until_ready()
+
+check_birthdays.start()
 
 @bot.event
 async def on_message(message: discord.Message):
