@@ -487,7 +487,7 @@ async def help_command(interaction: discord.Interaction):
     embed.set_footer(text="ご不明点等がございましたら、サポートサーバーに問い合わせてください。")
     await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
 
-@@tasks.loop(minutes=1)
+@tasks.loop(minutes=1)
 async def check_birthdays():
     now = datetime.now(timezone(timedelta(hours=9)))  # JST
     # 午後12時（正午）の00分ちょうどに実行
