@@ -104,6 +104,21 @@ async def check_permissions(interaction: discord.Interaction):
   except Exception as e:
       print(f"権限チェックエラー: {e}")
       return False
+async def can_modify_birthday(interaction: discord.Interaction, target_user_id: int) -> bool:
+    member = await interaction.guild.fetch_member(interaction.user.id)
+
+    if interaction.user.id == target_user_id:
+        return True
+
+    if member.guild_permissions.administrator:
+        return True
+
+    guild_id = str(interaction.guild_id)
+    allowed = allowed_roles.get(guild_id, [])
+    if any(role.id in allowed for role in member.roles):
+        return True
+
+    return False
 
 @tasks.loop(minutes=1)
 async def check_birthdays():
