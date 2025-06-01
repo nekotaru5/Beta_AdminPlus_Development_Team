@@ -238,6 +238,41 @@ async def show_birthday_list(interaction: discord.Interaction):
 
     await interaction.response.send_message(message, ephemeral=True)
 
+@bot.tree.command(name="birthdaych_list", description="誕生日通知チャンネル一覧を表示します（管理者または許可ロール限定）")
+async def birthdaych_list(interaction: discord.Interaction):
+    try:
+        member = await interaction.guild.fetch_member(interaction.user.id)
+        if not member.guild_permissions.administrator:
+            guild_id = str(interaction.guild_id)
+            allowed = allowed_roles.get(guild_id, [])
+            if not any(role.id in allowed for role in member.roles):
+                await interaction.response.send_message("このコマンドは管理者または許可ロールのみ使用できます。", ephemeral=True)
+                return
+    except Exception as e:
+        print(f"[birthdaych_list] 権限チェックエラー: {e}")
+        await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
+        return
+
+    if not birthday_channels:
+        await interaction.response.send_message("現在、誕生日通知チャンネルは登録されていません。", ephemeral=True)
+        return
+
+    description = ""
+    for guild_id, channel_id in birthday_channels.items():
+        channel = bot.get_channel(channel_id)
+        if channel:
+            description += f"・サーバーID `{guild_id}` → {channel.mention}\n"
+        else:
+            description += f"・サーバーID `{guild_id}` → チャンネルID `{channel_id}`（見つかりません）\n"
+
+    embed = discord.Embed(
+        title="🎉 誕生日通知チャンネル一覧",
+        description=description,
+        color=discord.Color.gold()
+    )
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 # ホワイトリスト管理コマンド
 @bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
