@@ -105,6 +105,27 @@ async def check_permissions(interaction: discord.Interaction):
       print(f"権限チェックエラー: {e}")
       return False
 
+@tasks.loop(minutes=1)
+async def check_birthdays():
+    now = datetime.now(timezone(timedelta(hours=9)))  # JST
+    # 午後12時（正午）の00分ちょうどに実行
+    if now.hour == 12 and now.minute == 0:
+        today = now.strftime("%m-%d")
+        for user_id, birth_date in birthday_list.items():
+            if birth_date[5:] == today:
+                user = await bot.fetch_user(int(user_id))
+                for guild_id, channel_id in birthday_channels.items():
+                    channel = bot.get_channel(channel_id)
+                    if channel:
+                        await channel.send(f"🎉 {user.mention} さん、お誕生日おめでとうございます！ 🎉")
+                        print(f"[{guild_id}] にて {user.id} の誕生日を祝いました")
+
+@check_birthdays.before_loop
+async def before_birthday_check():
+    await bot.wait_until_ready()
+
+check_birthdays.start()
+
 
 @bot.event
 async def on_ready():
@@ -127,28 +148,6 @@ async def on_ready():
 
     if not check_birthdays.is_running():
         check_birthdays.start()
-
-@tasks.loop(minutes=1)
-async def check_birthdays():
-    now = datetime.now(timezone(timedelta(hours=9)))  # JST
-    # 午後12時（正午）の00分ちょうどに実行
-    if now.hour == 12 and now.minute == 0:
-        today = now.strftime("%m-%d")
-        for user_id, birth_date in birthday_list.items():
-            if birth_date[5:] == today:
-                user = await bot.fetch_user(int(user_id))
-                for guild_id, channel_id in birthday_channels.items():
-                    channel = bot.get_channel(channel_id)
-                    if channel:
-                        await channel.send(f"🎉 {user.mention} さん、お誕生日おめでとうございます！ 🎉")
-                        print(f"[{guild_id}] にて {user.id} の誕生日を祝いました")
-
-@check_birthdays.before_loop
-async def before_birthday_check():
-    await bot.wait_until_ready()
-
-check_birthdays.start()
-
 
 
 @bot.command()
