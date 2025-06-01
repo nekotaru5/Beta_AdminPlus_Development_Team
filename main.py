@@ -238,7 +238,7 @@ async def show_birthday_list(interaction: discord.Interaction):
 
     await interaction.response.send_message(message, ephemeral=True)
 
-@bot.tree.command(name="birthdaych_list", description="誕生日通知チャンネル一覧を表示します（管理者または許可ロール限定）")
+@bot.tree.command(name="birthdaych_list", description="このサーバーの誕生日通知チャンネルを表示します（管理者または許可ロール限定）")
 async def birthdaych_list(interaction: discord.Interaction):
     try:
         member = await interaction.guild.fetch_member(interaction.user.id)
@@ -253,26 +253,21 @@ async def birthdaych_list(interaction: discord.Interaction):
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
-    if not birthday_channels:
-        await interaction.response.send_message("現在、誕生日通知チャンネルは登録されていません。", ephemeral=True)
+    guild_id = str(interaction.guild_id)
+    channel_id = birthday_channels.get(guild_id)
+
+    if not channel_id:
+        await interaction.response.send_message("このサーバーには誕生日通知チャンネルが設定されていません。", ephemeral=True)
         return
 
-    description = ""
-    for guild_id, channel_id in birthday_channels.items():
-        channel = bot.get_channel(channel_id)
-        if channel:
-            description += f"・サーバーID `{guild_id}` → {channel.mention}\n"
-        else:
-            description += f"・サーバーID `{guild_id}` → チャンネルID `{channel_id}`（見つかりません）\n"
+    channel = interaction.guild.get_channel(channel_id) or bot.get_channel(channel_id)
 
-    embed = discord.Embed(
-        title="🎉 誕生日通知チャンネル一覧",
-        description=description,
-        color=discord.Color.gold()
-    )
+    if channel:
+        message = f"🎂 このサーバーの誕生日通知チャンネルは {channel.mention} です。"
+    else:
+        message = f"⚠️ 登録されたチャンネルID `{channel_id}` が見つかりません。削除された可能性があります。"
 
-    await interaction.response.send_message(embed=embed, ephemeral=True)
-
+    await interaction.response.send_message(message, ephemeral=True)
 
 # ホワイトリスト管理コマンド
 @bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
