@@ -144,7 +144,9 @@ async def check_birthdays():
                 await channel.send("\n".join(birthday_messages))
             else:
                 print(f"[{guild_id}] では誕生日の該当者はいませんでした")
-
+@check_birthdays.before_loop
+async def before_birthday_check():
+    await bot.wait_until_ready()
 # ←ここで呼ばずに、
 
 @bot.event
