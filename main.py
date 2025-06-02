@@ -132,22 +132,18 @@ async def check_birthdays():
             if not guild or not channel:
                 continue
 
-            birthday_found = False
+            birthday_messages = []
             for user_id, birth_date in birthday_list.items():
                 if birth_date[5:] == today:
                     member = guild.get_member(int(user_id))
                     if member:
-                        await channel.send(f"🎉 {member.mention} さん、お誕生日おめでとうございます！ 🎉")
+                        birthday_messages.append(f"🎉 {member.mention} さん、お誕生日おめでとうございます！ 🎉")
                         print(f"[{guild_id}] にて {user_id} の誕生日を祝いました")
-                        birthday_found = True
 
-            if not birthday_found:
-                await channel.send("今日は誕生日の人はいません。")
+            if birthday_messages:
+                await channel.send("\n".join(birthday_messages))
+            else:
                 print(f"[{guild_id}] では誕生日の該当者はいませんでした")
-
-@check_birthdays.before_loop
-async def before_birthday_check():
-    await bot.wait_until_ready()
 
 # ←ここで呼ばずに、
 
