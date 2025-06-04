@@ -181,7 +181,7 @@ updates = [
 def build_update_embed():
     embed = discord.Embed(
         title="🛠️ アップデート履歴",
-        description="最新のバージョン情報です：",
+        description="最新のバージョン情報です",
         color=discord.Color.orange()
     )
 
@@ -204,7 +204,7 @@ def build_update_embed():
             content += "\n"
 
         embed.add_field(
-            name=f"🔷 バージョン {update['version']}",
+            name=f"Version {update['version']}",
             value=content.strip(),
             inline=False
         )
