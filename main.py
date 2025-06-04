@@ -17,7 +17,7 @@ if not TOKEN:
 intents = discord.Intents.all()
 
 # Botのインスタンス作成
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 tree = bot.tree
 
 class ServerInfo(commands.Cog):
