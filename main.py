@@ -167,6 +167,63 @@ async def on_ready():
         print(f"コマンドの同期に失敗: {e}")
 
     print(f"{bot.user} としてログインしました")
+# 更新履歴データ（同じままでOK）
+updates = [
+    {
+        "version": "1.0",
+        "add": ["誕生日機能を追加"],
+        "change": ["特に無し"],
+        "fix": ["特に無し"]
+    }
+]
+
+# 🔁 共通処理を関数化
+def build_update_embed():
+    embed = discord.Embed(
+        title="🛠️ アップデート履歴",
+        description="最新のバージョン情報です：",
+        color=discord.Color.orange()
+    )
+
+    for update in updates:
+        content = ""
+
+        if update["add"]:
+            content += "**追加点**\n"
+            content += "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["add"]))
+            content += "\n\n"
+
+        if update["change"]:
+            content += "**変更点**\n"
+            content += "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["change"]))
+            content += "\n\n"
+
+        if update["fix"]:
+            content += "**修正点**\n"
+            content += "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["fix"]))
+            content += "\n"
+
+        embed.add_field(
+            name=f"🔷 バージョン {update['version']}",
+            value=content.strip(),
+            inline=False
+        )
+
+    embed.set_footer(text="最終更新: 2025年6月4日")
+    embed.set_author(name="NekoBot 開発チーム")
+    return embed
+
+# ✅ !update（従来のプレフィックスコマンド）
+@bot.command()
+async def update(ctx):
+    embed = build_update_embed()
+    await ctx.send(embed=embed)
+
+# ✅ /update（新しいスラッシュコマンド）
+@bot.tree.command(name="update", description="アップデート履歴を表示します")
+async def slash_update(interaction: discord.Interaction):
+    embed = build_update_embed()
+    await interaction.response.send_message(embed=embed)
 
 @bot.command()
 async def Admin(ctx):
