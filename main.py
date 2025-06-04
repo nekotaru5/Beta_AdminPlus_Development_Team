@@ -210,7 +210,7 @@ def build_update_embed():
         )
 
     embed.set_footer(text="最終更新: 2025年6月4日")
-    embed.set_author(name="NekoBot 開発チーム")
+    embed.set_author(name="Admin Plus Dvelopment Team")
     return embed
 
 # ✅ !update（従来のプレフィックスコマンド）
