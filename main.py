@@ -26,6 +26,20 @@ class ServerInfo(commands.Cog):
 
 # 許可ロールの管理
 # 誕生日リスト（ユーザーID: "YYYY-MM-DD"）
+log_channels = {}
+
+def load_log_channels():
+    try:
+        with open("log_channels.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[log_channels] 読み込みエラー: {e}")
+        return {}
+
+def save_log_channels():
+    with open("log_channels.json", "w") as f:
+        json.dump(log_channels, f, indent=4)
+
 birthday_list = {}
 
 def load_birthday_list():
@@ -162,11 +176,12 @@ async def before_birthday_check():
 
 @bot.event
 async def on_ready():
-    global allowed_roles, announcement_channels, birthday_list, birthday_channels
+    global allowed_roles, announcement_channels, birthday_list, birthday_channels,log_channels
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
     birthday_list = load_birthday_list()
     birthday_channels = load_birthday_channels()
+    log_channels = load_log_channels()
 
     if not check_birthdays.is_running():  # ここで起動
         check_birthdays.start()
@@ -236,6 +251,28 @@ async def update(ctx):
     await ctx.send(embed=embed)
 
 # ✅ /update（新しいスラッシュコマンド）
+
+@tree.command(name="logch", description="ログ送信先チャンネルを設定します（管理者または許可ロール限定）")
+@app_commands.describe(channel="ログを送信するチャンネル")
+async def set_log_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    if not await check_permissions(interaction):
+        await interaction.response.send_message("❌ このコマンドを実行する権限がありません。", ephemeral=True)
+        return
+
+    guild_id = str(interaction.guild_id)
+    is_new = guild_id not in log_channels  # 新規登録かどうか判定
+    log_channels[guild_id] = channel.id
+    save_log_channels()
+
+    if is_new:
+        log_msg = f"✅ [{guild_id}] で、[{channel.id}] が、ログチャンネルとして登録されました。"
+    else:
+        log_msg = f"⚠️ [{guild_id}] で、[{channel.id}] にログチャンネルが上書きされました。"
+
+    await interaction.response.send_message(log_msg)
+    print(f"[logch] {log_msg}")
+    await send_log(f"[logch] {log_msg}")# ← コンソールログ出力
+
 @bot.tree.command(name="update", description="アップデート履歴を表示します")
 async def slash_update(interaction: discord.Interaction):
     embed = build_update_embed()
@@ -316,6 +353,7 @@ async def delete_birthdaylist(interaction: discord.Interaction, user: discord.Us
         save_birthday_list()
         await interaction.response.send_message(f"{user.mention} の誕生日を削除しました。", ephemeral=True)
         print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
+        await send_log(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
     else:
         await interaction.response.send_message(f"{user.mention} は誕生日リストに登録されていません。", ephemeral=True)
 
@@ -361,6 +399,7 @@ async def birthdaych_list(interaction: discord.Interaction):
                 return
     except Exception as e:
         print(f"[birthdaych_list] 権限チェックエラー: {e}")
+        await send_log(f"[birthdaych_list] 権限チェックエラー: {e}")
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
@@ -741,4 +780,54 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
+@bot.event
+async def on_message_edit(before, after):
+    if before.author.bot or before.content == after.content:
+        return
+
+    ch_id = log_channels.get(str(before.guild.id))
+    if not ch_id:
+        return
+
+    channel = bot.get_channel(ch_id)
+    if not channel:
+        return
+
+    embed = discord.Embed(
+        title="✏️ メッセージ編集",
+        color=discord.Color.orange(),
+        timestamp=datetime.utcnow()
+    )
+    embed.add_field(name="変更前", value=before.content or "（空）", inline=False)
+    embed.add_field(name="変更後", value=after.content or "（空）", inline=False)
+    embed.add_field(name="チャンネル", value=before.channel.mention)
+    embed.set_author(name=str(before.author), icon_url=before.author.display_avatar.url)
+
+    await channel.send(embed=embed)
+
+
+@bot.event
+async def on_message_delete(message):
+    if message.author.bot:
+        return
+
+    ch_id = log_channels.get(str(message.guild.id))
+    if not ch_id:
+        return
+
+    channel = bot.get_channel(ch_id)
+    if not channel:
+        return
+
+    embed = discord.Embed(
+        title="🗑️ メッセージ削除",
+        description=message.content or "（空）",
+        color=discord.Color.dark_grey(),
+        timestamp=datetime.utcnow()
+    )
+    embed.add_field(name="チャンネル", value=message.channel.mention)
+    embed.set_author(name=str(message.author), icon_url=message.author.display_avatar.url)
+
+    await channel.send(embed=embed)
+    
 bot.run(TOKEN)
