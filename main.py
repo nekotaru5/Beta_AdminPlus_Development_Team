@@ -250,7 +250,7 @@ async def update(ctx):
     embed = build_update_embed()
     await ctx.send(embed=embed)
 
-@bot.command(name="help")
+@bot.command(name="cmds")
 async def prefix_help(ctx):
     embed = discord.Embed(
         title="ヘルプ",
@@ -290,7 +290,7 @@ async def prefix_help(ctx):
             "`/user_information` - ユーザー情報を表示\n"
             "`/support` - サポートサーバーの招待リンクを表示\n"
             "`/help` - コマンドの詳細を表示\n"
-            "`!help` - コマンドの詳細を表示\n"
+            "`!cmds` - コマンドの詳細を表示\n"
             "`/add_birthdaylist` - 誕生日を登録します\n"
             "`/birthday_list` - 登録されている誕生日を表示します"
         ),
@@ -764,7 +764,7 @@ async def help_command(interaction: discord.Interaction):
             "`/user_information` - ユーザー情報を表示\n"
             "`/support` - サポートサーバーの招待リンクを表示\n"
             "`/help` - コマンドの詳細を表示\n"
-            "`!help` - コマンドの詳細を表示\n"
+            "`!cmds` - コマンドの詳細を表示\n"
             "`/add_birthdaylist` - 誕生日を登録します\n"
             "`/birthday_list` - 登録されている誕生日を表示します"
         ),
@@ -825,7 +825,7 @@ async def on_message(message: discord.Message):
                     "`/user_information` - ユーザー情報を表示\n"
                     "`/support` - サポートサーバーの招待リンクを表示\n"
                     "`/help` - コマンドの詳細を表示\n"
-                    "`!help` - コマンドの詳細を表示\n"
+                    "`!cmds` - コマンドの詳細を表示\n"
                     "`/add_birthdaylist` - 誕生日を登録します\n"
                     "`/birthday_list` - 登録されている誕生日を表示します"
                 ),
