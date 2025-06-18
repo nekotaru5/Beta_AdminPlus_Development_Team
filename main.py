@@ -178,6 +178,7 @@ async def on_ready():
         await send_log(bot, "コマンドを同期しました")
     except Exception as e:
         print(f"コマンドの同期に失敗: {e}")
+        await send_log(f"コマンドの同期に失敗: {e}")
 
     print(f"{bot.user} としてログインしました")
     await send_log(bot, f"{bot.user} としてログインしました")
@@ -257,6 +258,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
                 return
     except Exception as e:
         print(f"[setbirthdaych] 権限チェックエラー: {e}")
+        await send_log(f"[setbirthdaych] 権限チェックエラー: {e}")
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
@@ -268,11 +270,15 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
         save_birthday_channels()
         await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
         print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
+        await send_log(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
+        
     else:
         if existing_channel_id is not None:
             print(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
+            await send_log(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
         else:
             print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
+            await send_log(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
 
         birthday_channels[guild_id] = channel.id
         save_birthday_channels()
@@ -295,6 +301,7 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
     save_birthday_list()
     await interaction.response.send_message(f"{user.mention} の誕生日を {birthday} に登録しました。", ephemeral=True)
     print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
+    await send_log(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
 
 @bot.tree.command(name="delete_birthdaylist", description="誕生日を削除します")
 @app_commands.describe(user="削除するユーザー")
