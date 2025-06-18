@@ -200,7 +200,13 @@ async def on_ready():
     await send_log(bot, f"{bot.user} としてログインしました")
 # 更新履歴データ（同じままでOK）
 updates = [
-    {
+   {
+        "version": "1.1",
+        "add": ["!helpコマンド","/logchコマンド"],
+        "change": ["特に無し"],
+        "fix": ["/helpの内容を修正"]
+    },
+ {
         "version": "1.0",
         "add": ["誕生日機能を追加"],
         "change": ["特に無し"],
