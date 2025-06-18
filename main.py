@@ -150,6 +150,7 @@ async def check_birthdays():
                     if member:
                         birthday_messages.append(f"🎉 {member.mention} さん、お誕生日おめでとうございます！ 🎉")
                         print(f"[{guild_id}] にて {user_id} の誕生日を祝いました")
+                        await send_log(f"[{guild_id}] にて {user_id} の誕生日を祝いました")
 
             if birthday_messages:
                 await channel.send("\n".join(birthday_messages))
