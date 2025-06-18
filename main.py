@@ -441,6 +441,7 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
+        await send_log(f"権限チェックエラー: {e}")
         return
 
     guild_id = str(interaction.guild_id)
@@ -450,7 +451,8 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
     if role.id not in allowed_roles[guild_id]:
         allowed_roles[guild_id].append(role.id)
         save_allowed_roles()
-        print(f"[{guild_id}] でロール {role.id} が追加されました")  # ← ここ追加
+        print(f"[{guild_id}] でロール {role.id} が追加されました")
+        await send_log(f"[{guild_id}] でロール {role.id} が追加されました") # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールに追加しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は既に許可ロールです", ephemeral=True)
@@ -467,13 +469,15 @@ async def delete_whitelist(interaction: discord.Interaction, role: discord.Role)
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
+        await send_log(f"権限チェックエラー: {e}")
         return
 
     guild_id = str(interaction.guild_id)
     if guild_id in allowed_roles and role.id in allowed_roles[guild_id]:
         allowed_roles[guild_id].remove(role.id)
         save_allowed_roles()
-        print(f"[{guild_id}] でロール {role.id} が削除されました")  # ← ここ追加
+        print(f"[{guild_id}] でロール {role.id} が削除されました")
+        await send_log(f"[{guild_id}] でロール {role.id} が削除されました")  # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は許可ロールではありません", ephemeral=True)
@@ -488,6 +492,7 @@ async def show_whitelist(interaction: discord.Interaction):
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
+        await send_log(f"権限チェックエラー: {e}")
         return
 
     guild_id = str(interaction.guild_id)
@@ -530,7 +535,8 @@ async def delete_announcement_list(interaction: discord.Interaction, channel: di
     if guild_id in announcement_channels and channel.id in announcement_channels[guild_id]:
         announcement_channels[guild_id].remove(channel.id)
         save_announcement_channels()
-        print(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました")  # ← 追加
+        print(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました")
+        await send_log(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました") # ← 追加
         await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{channel.mention} は自動アナウンス公開リストに含まれていません。", ephemeral=True)
@@ -736,7 +742,11 @@ async def on_message(message: discord.Message):
                     "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
                     "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
                     "`/announcement_list` - 自動アナウンス公開リストを表示\n"
-                    "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除"
+                    "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
+                    "`/birthdaych_list ` - 誕生日通知チャンネルを表示\n"
+                    "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
+                    "`/birthday_list` - 登録されている誕生日を表示します\n"
+                    "`/add_birthdaylist` - 誕生日を登録します"
                 ),
                 inline=False
             )
@@ -747,7 +757,10 @@ async def on_message(message: discord.Message):
                     "`/server_information` - サーバー情報を表示\n"
                     "`/user_information` - ユーザー情報を表示\n"
                     "`/support` - サポートサーバーの招待リンクを表示\n"
-                    "`/help` - コマンドの詳細を表示"
+                    "`/help` - コマンドの詳細を表示\n"
+                    "`!help` - コマンドの詳細を表示\n"
+                    "`/add_birthdaylist` - 誕生日を登録します\n"
+                    "`/birthday_list` - 登録されている誕生日を表示します"
                 ),
                 inline=False
             )
@@ -772,11 +785,14 @@ async def on_message(message: discord.Message):
                     await message.add_reaction("👎")
                 except discord.errors.Forbidden:
                     print(f"権限不足でメッセージの公開またはリアクションの追加に失敗 (Channel: {message.channel.id})")
+                    await send_log(f"権限不足でメッセージの公開またはリアクションの追加に失敗 (Channel: {message.channel.id})")
                 except Exception as e:
                     print(f"メッセージの処理中にエラーが発生: {e}")
+                    await send_log(f"メッセージの処理中にエラーが発生: {e}")
 
     except Exception as e:
         print(f"on_messageイベントでエラーが発生: {e}")
+        await send_log(f"on_messageイベントでエラーが発生: {e}")
 
     await bot.process_commands(message)
 
