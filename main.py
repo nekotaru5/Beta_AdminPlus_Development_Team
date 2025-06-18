@@ -118,6 +118,19 @@ async def can_modify_birthday(interaction: discord.Interaction, target_user_id: 
 
     return False
 
+
+# 🔧 ログを送る先のチャンネルID（数値）を指定
+LOG_CHANNEL_ID = 1384839728393617539  # ← 実際のチャンネルIDに置き換え
+
+async def send_log(bot, message: str):
+    await bot.wait_until_ready()  # Botの起動待機
+    channel = bot.get_channel(LOG_CHANNEL_ID)
+    if channel:
+        try:
+            await channel.send(f"📝 ログ: {message}")
+        except Exception as e:
+            print(f"[ログ送信エラー] {e}")
+
 @tasks.loop(minutes=1)
 async def check_birthdays():
     now = datetime.now(timezone(timedelta(hours=9)))  # JST
@@ -162,11 +175,12 @@ async def on_ready():
 
     try:
         await bot.tree.sync()
-        print("コマンドを同期しました")
+        await send_log(bot, "コマンドを同期しました")
     except Exception as e:
         print(f"コマンドの同期に失敗: {e}")
 
     print(f"{bot.user} としてログインしました")
+    await send_log(bot, f"{bot.user} としてログインしました")
 # 更新履歴データ（同じままでOK）
 updates = [
     {
