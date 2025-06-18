@@ -264,14 +264,18 @@ async def set_log_channel(interaction: discord.Interaction, channel: discord.Tex
     log_channels[guild_id] = channel.id
     save_log_channels()
 
+    # ユーザー向けメッセージ
     if is_new:
-        log_msg = f"✅ [{guild_id}] で、[{channel.id}] が、ログチャンネルとして登録されました。"
+        user_msg = f"✅ ログチャンネルに登録しました： {channel.mention}"
     else:
-        log_msg = f"⚠️ [{guild_id}] で、[{channel.id}] にログチャンネルが上書きされました。"
+        user_msg = f"⚠️ ログチャンネルを上書きしました： {channel.mention}"
 
-    await interaction.response.send_message(log_msg)
-    print(f"[logch] {log_msg}")
-    await send_log(f"[logch] {log_msg}")# ← コンソールログ出力
+    await interaction.response.send_message(user_msg, ephemeral=True)  # 実行者のみ見える
+
+    # コンソールログ＆ログチャンネル送信用メッセージ
+    log_msg = f"✅ [{guild_id}] で、[{channel.id}] がログチャンネルとして登録されました。" if is_new else f"⚠️ [{guild_id}] で、[{channel.id}] にログチャンネルが上書きされました。"
+    print(log_msg)
+    await send_log(log_msg)  # 送信先はログチャンネル（別途実装済み）
 
 @bot.tree.command(name="update", description="アップデート履歴を表示します")
 async def slash_update(interaction: discord.Interaction):
