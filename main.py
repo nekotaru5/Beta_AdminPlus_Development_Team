@@ -670,46 +670,54 @@ async def support(interaction: discord.Interaction):
 
 @bot.tree.command(name="help", description="コマンドの詳細を表示します。")
 async def help_command(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="コマンド一覧",
-        description="Botで使用できるコマンドの概要です。",
-        color=discord.Color.green()
-    )
+                description="Botで使用できるコマンドの概要です。",
+                color=discord.Color.green()
+            )
 
-    embed.add_field(
-        name="■ 管理者専用",
-        value=(
-            "`/add_whitelist` - コマンド許可ロールを追加\n"
-            "`/whitelist` - コマンド許可ロール一覧を表示\n"
-            "`/delete_whitelist` - コマンド許可ロールを削除"
-        ),
-        inline=False
-    )
+            embed.add_field(
+                name="■ 管理者専用",
+                value=(
+                    "`/add_whitelist` - コマンド許可ロールを追加\n"
+                    "`/whitelist` - コマンド許可ロール一覧を表示\n"
+                    "`/delete_whitelist` - コマンド許可ロールを削除"
+                ),
+                inline=False
+            )
 
-    embed.add_field(
-        name="■ 管理者 + 許可ロール",
-        value=(
-            "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
-            "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
-            "`/announcement_list` - 自動アナウンス公開リストを表示\n"
-            "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除"
-        ),
-        inline=False
-    )
+            embed.add_field(
+                name="■ 管理者 + 許可ロール",
+                value=(
+                    "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
+                    "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
+                    "`/announcement_list` - 自動アナウンス公開リストを表示\n"
+                    "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
+                    "`/birthdaych_list ` - 誕生日通知チャンネルを表示\n"
+                    "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
+                    "`/birthday_list` - 登録されている誕生日を表示します\n"
+                    "`/add_birthdaylist` - 誕生日を登録します"
+                ),
+                inline=False
+            )
 
-    embed.add_field(
-        name="■ 全ユーザー利用可",
-        value=(
-            "`/server_information` - サーバー情報を表示\n"
-            "`/user_information` - ユーザー情報を表示\n"
-            "`/support` - サポートサーバーの招待リンクを表示\n"
-            "`/help` - コマンドの詳細を表示"
-        ),
-        inline=False
-    )
+            embed.add_field(
+                name="■ 全ユーザー利用可",
+                value=(
+                    "`/server_information` - サーバー情報を表示\n"
+                    "`/user_information` - ユーザー情報を表示\n"
+                    "`/support` - サポートサーバーの招待リンクを表示\n"
+                    "`/help` - コマンドの詳細を表示\n"
+                    "`!help` - コマンドの詳細を表示\n"
+                    "`/add_birthdaylist` - 誕生日を登録します\n"
+                    "`/birthday_list` - 登録されている誕生日を表示します"
+                ),
+                inline=False
+            )
 
-    embed.set_footer(text="ご不明点等がございましたら、サポートサーバーに問い合わせてください。")
-    await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
+            embed.add_field(
+                name="サポートサーバー",
+                value="[こちらをクリック](https://discord.gg/Yv9uJ32KkT)",
+                inline=False
+            )    await interaction.response.send_message(embed=embed)  # ← ephemeral=False にする or 削除でOK
 
 
 @bot.event
