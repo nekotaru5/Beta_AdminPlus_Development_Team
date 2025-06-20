@@ -10,18 +10,38 @@ import os
 from threading import Thread
 from flask import Flask
 
+
 app = Flask('')
 
 @app.route('/')
 def home():
-    return "Bot is running."
-
+    return """
+    <html>
+      <head><title>AdminPlus稼働状況</title></head>
+      <body style="font-family: '游ゴシック', YuGothic, sans-serif; text-align: center; margin-top: 50px;">
+        <h1>🚀 [Beta]AdminPlusは現在稼働中です。</h1>
+        <p>問題なく稼働しています。</p>
+        <p>いつもご利用ありがとうございます</p>
+      </body>
+    </html>
+    """
 def run():
     app.run(host='0.0.0.0', port=8080)
+
+def ping_loop(url):
+    while True:
+        try:
+            response = requests.get(url)
+            print(f'Pinged {url}: {response.status_code}')
+        except Exception as e:
+            print(f'Ping error: {e}')
+        time.sleep(300)
 
 # Flask起動用のスレッドを立てる
 Thread(target=run).start()
 
+# ここでping_loopを別スレッドで動かす
+threading.Thread(target=ping_loop, args=('https://adminplus-development-team.onrender.com',), daemon=True).start()
 TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 if not TOKEN:
     print("エラー: 環境変数 DISCORD_BOT_TOKEN が設定されていません。")
