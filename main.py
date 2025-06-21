@@ -262,9 +262,10 @@ async def on_ready():
 
 # ──────────────
 # 非公開用（ephemeral）ヘルプ
-b_message_private = None  # グローバルで保持（ただしephemeralでは編集不可）
+def build_help_embed_and_view_ephemeral():
+    import discord
 
-def build_help_embed_and_view():
+    # 最初のヘルプEmbed（コマンド一覧）
     embed = discord.Embed(
         title="コマンド一覧",
         description="カテゴリを選んで、使用可能なコマンドを確認してください。",
@@ -293,7 +294,6 @@ def build_help_embed_and_view():
             self.parent_view = parent_view
 
         async def callback(self, interaction: discord.Interaction):
-            global b_message_private
             category = self.values[0]
 
             if category == "admin":
@@ -322,19 +322,32 @@ def build_help_embed_and_view():
                 detail_embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
                 detail_embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
 
-            await interaction.response.defer(ephemeral=True)
-
-            if b_message_private is None:
-                b_message_private = await interaction.followup.send(embed=detail_embed, ephemeral=True)
-                await interaction.followup.send("📬 詳細を表示しました（このメッセージはあなただけに見えています）。", ephemeral=True)
-            else:
-                # ephemeralメッセージは編集できないので、その都度送信
-                await interaction.followup.send(embed=detail_embed, ephemeral=True)
+            await interaction.response.edit_message(embed=detail_embed, view=self.parent_view)
 
     class HelpView(discord.ui.View):
         def __init__(self):
             super().__init__(timeout=None)
-            self.add_item(HelpSelect(self))
+            self.select = HelpSelect(self)
+            self.add_item(self.select)
+
+            self.back_button = discord.ui.Button(label="ヘルプに戻る", style=discord.ButtonStyle.gray)
+            self.back_button.callback = self.back_to_main
+            self.add_item(self.back_button)
+
+        async def back_to_main(self, interaction: discord.Interaction):
+            embed = discord.Embed(
+                title="コマンド一覧",
+                description="カテゴリを選んで、使用可能なコマンドを確認してください。",
+                color=0x3498db
+            )
+            embed.add_field(
+                name="🔗 サポートサーバー",
+                value="[こちらを押してください](https://discord.gg/ku8gdut5U2) でサポートサーバーに参加できます。",
+                inline=False
+            )
+            embed.set_footer(text="不明点があればサポートサーバーをご利用ください。")
+
+            await interaction.response.edit_message(embed=embed, view=self)
 
     view = HelpView()
     return embed, view
@@ -999,7 +1012,7 @@ async def support(interaction: discord.Interaction):
 
 @bot.tree.command(name="help", description="コマンド一覧を表示します")
 async def help(interaction: discord.Interaction):
-    embed, view = build_help_embed_and_view()  # 非公開用の関数名に合わせてください
+    embed, view = build_help_embed_and_view_ephemeral()  # 非公開用の関数名に合わせてください
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.event
