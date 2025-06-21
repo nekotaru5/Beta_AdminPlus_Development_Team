@@ -61,6 +61,24 @@ class ServerInfo(commands.Cog):
 
 
 
+# グローバル変数で保持
+white_users = {}
+
+# 読み込み関数
+def load_white_users():
+    global white_users
+    try:
+        with open("WhiteUser.json", "r", encoding="utf-8") as f:
+            white_users = json.load(f)
+    except Exception as e:
+        print(f"[WhiteUser] 読み込みエラー: {e}")
+        white_users = {}
+
+# 保存関数
+def save_white_users():
+    with open("WhiteUser.json", "w", encoding="utf-8") as f:
+        json.dump(white_users, f, indent=4)
+
 # 許可ロールの管理
 # 誕生日リスト（ユーザーID: "YYYY-MM-DD"）
 log_channels = {}
@@ -350,6 +368,27 @@ async def prefix_help(ctx):
 
 
 # ✅ /update（新しいスラッシュコマンド）
+@bot.tree.command(name="dm", description="指定したユーザーにDMを送信します。")
+@app_commands.describe(user="DMを送る相手", message="送信するメッセージ")
+async def dm(interaction: discord.Interaction, user: discord.User, message: str):
+    if "allowed_users" not in white_users:
+        await interaction.response.send_message("⚠️ ホワイトリストがロードされていません。", ephemeral=True)
+        return
+
+    if interaction.user.id not in white_users["allowed_users"]:
+        await interaction.response.send_message("❌ あなたにはこのコマンドを使う権限がありません。", ephemeral=True)
+        return
+
+    try:
+        await user.send(message)
+        await interaction.response.send_message(f"✅ {user.name} にDMを送りました。", ephemeral=True)
+        print(f"[DM送信ログ] {interaction.user} が {user} に以下のDMを送信しました:\n{message}\n")
+    except discord.Forbidden:
+        await interaction.response.send_message("⚠️ 相手のDM設定により送信できません。", ephemeral=True)
+        print(f"[送信失敗] {interaction.user} → {user}：DMが拒否された可能性あり")
+    except Exception as e:
+        await interaction.response.send_message(f"❌ エラーが発生しました: {e}", ephemeral=True)
+        print(f"[エラー] {interaction.user} → {user}：{e}")
 
 @tree.command(name="logch", description="ログ送信先チャンネルを設定します（管理者または許可ロール限定）")
 @app_commands.describe(channel="ログを送信するチャンネル")
