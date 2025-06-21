@@ -556,9 +556,10 @@ async def update(ctx):
 async def help(ctx):
     embed, view = build_helpb_embed_and_view()
     try:
-        await ctx.author.send(embed=embed, view=view)
+        dm_channel = await ctx.author.create_dm()
+        await dm_channel.send(embed=embed, view=view)
     except discord.Forbidden:
-        # DM送れなくても何もしない（エラーメッセージも出さない）
+        # DMが拒否されている場合は無視
         pass
 
 # ✅ /update（新しいスラッシュコマンド）
@@ -1002,7 +1003,7 @@ async def support(interaction: discord.Interaction):
 
 @bot.tree.command(name="help", description="コマンド一覧を表示します")
 async def help(interaction: discord.Interaction):
-    embed, view = build_help_embed_and_view()
+    embed, view = build_help_embed_and_view_ephemeral()
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.event
