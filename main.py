@@ -421,28 +421,26 @@ updates = [
     }
 ]
 
-# ────────────────
-# 非公開メッセージ用（ephemeral=True）
-# ────────────────
+def format_update_content(update):
+    content = ""
+    if update["add"]:
+        content += "**追加点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["add"])) + "\n\n"
+    if update["change"]:
+        content += "**変更点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["change"])) + "\n\n"
+    if update["fix"]:
+        content += "**修正点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(update["fix"])) + "\n"
+    return content.strip()
+
+
 def build_update_embed_and_view_ephemeral():
     import discord
 
+    latest = updates[0]
     embed = discord.Embed(
-        title="🛠️ アップデート履歴",
-        description="最新のバージョン情報です。下のメニューからバージョンを選択してください。",
+        title=f"🛠️ アップデート履歴 Version {latest['version']}",
+        description=format_update_content(latest),
         color=discord.Color.orange()
     )
-
-    # 最初は最新バージョンの情報を埋め込みにセット
-    latest = updates[0]
-    content = ""
-    if latest["add"]:
-        content += "**追加点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["add"])) + "\n\n"
-    if latest["change"]:
-        content += "**変更点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["change"])) + "\n\n"
-    if latest["fix"]:
-        content += "**修正点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["fix"])) + "\n"
-    embed.add_field(name=f"Version {latest['version']}", value=content.strip(), inline=False)
     embed.set_footer(text="最終更新: 2025年6月4日")
     embed.set_author(name="Admin Plus Development Team")
 
@@ -463,23 +461,13 @@ def build_update_embed_and_view_ephemeral():
         async def callback(self, interaction: discord.Interaction):
             index = int(self.values[0])
             selected = updates[index]
-            content = ""
-            if selected["add"]:
-                content += "**追加点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["add"])) + "\n\n"
-            if selected["change"]:
-                content += "**変更点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["change"])) + "\n\n"
-            if selected["fix"]:
-                content += "**修正点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["fix"])) + "\n"
-
             new_embed = discord.Embed(
-                title="🛠️ アップデート履歴",
+                title=f"🛠️ アップデート履歴 Version {selected['version']}",
+                description=format_update_content(selected),
                 color=discord.Color.orange()
             )
-            new_embed.add_field(name=f"Version {selected['version']}", value=content.strip(), inline=False)
             new_embed.set_footer(text="最終更新: 2025年6月4日")
             new_embed.set_author(name="Admin Plus Development Team")
-
-            # 編集はephemeralメッセージなのでfollowup.sendではなくedit_message
             await interaction.response.edit_message(embed=new_embed)
 
     class UpdateView(discord.ui.View):
@@ -491,27 +479,15 @@ def build_update_embed_and_view_ephemeral():
     return embed, view
 
 
-# ────────────────
-# 公開メッセージ用（ephemeral=False）
-# ────────────────
 def build_update_embed_and_view_public():
     import discord
 
+    latest = updates[0]
     embed = discord.Embed(
-        title="🛠️ アップデート履歴",
-        description="最新のバージョン情報です。下のメニューからバージョンを選択してください。",
+        title=f"🛠️ アップデート履歴 Version {latest['version']}",
+        description=format_update_content(latest),
         color=discord.Color.orange()
     )
-
-    latest = updates[0]
-    content = ""
-    if latest["add"]:
-        content += "**追加点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["add"])) + "\n\n"
-    if latest["change"]:
-        content += "**変更点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["change"])) + "\n\n"
-    if latest["fix"]:
-        content += "**修正点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(latest["fix"])) + "\n"
-    embed.add_field(name=f"Version {latest['version']}", value=content.strip(), inline=False)
     embed.set_footer(text="最終更新: 2025年6月4日")
     embed.set_author(name="Admin Plus Development Team")
 
@@ -532,22 +508,13 @@ def build_update_embed_and_view_public():
         async def callback(self, interaction: discord.Interaction):
             index = int(self.values[0])
             selected = updates[index]
-            content = ""
-            if selected["add"]:
-                content += "**追加点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["add"])) + "\n\n"
-            if selected["change"]:
-                content += "**変更点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["change"])) + "\n\n"
-            if selected["fix"]:
-                content += "**修正点**\n" + "\n".join(f"{i+1}. {line}" for i, line in enumerate(selected["fix"])) + "\n"
-
             new_embed = discord.Embed(
-                title="🛠️ アップデート履歴",
+                title=f"🛠️ アップデート履歴 Version {selected['version']}",
+                description=format_update_content(selected),
                 color=discord.Color.orange()
             )
-            new_embed.add_field(name=f"Version {selected['version']}", value=content.strip(), inline=False)
             new_embed.set_footer(text="最終更新: 2025年6月4日")
             new_embed.set_author(name="Admin Plus Development Team")
-
             await interaction.response.edit_message(embed=new_embed)
 
     class UpdateView(discord.ui.View):
