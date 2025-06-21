@@ -262,6 +262,8 @@ async def on_ready():
 
 # ──────────────
 # 非公開用（ephemeral）ヘルプ
+b_message_private = None  # グローバルで保持（ただしephemeralでは編集不可）
+
 def build_help_embed_and_view_private():
     embed = discord.Embed(
         title="コマンド一覧",
@@ -291,6 +293,7 @@ def build_help_embed_and_view_private():
             self.parent_view = parent_view
 
         async def callback(self, interaction: discord.Interaction):
+            global b_message_private
             category = self.values[0]
 
             if category == "admin":
@@ -319,8 +322,14 @@ def build_help_embed_and_view_private():
                 detail_embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
                 detail_embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
 
-            # ephemeralは編集不可なので新規送信のみ
-            await interaction.response.send_message(embed=detail_embed, ephemeral=True)
+            await interaction.response.defer(ephemeral=True)
+
+            if b_message_private is None:
+                b_message_private = await interaction.followup.send(embed=detail_embed, ephemeral=True)
+                await interaction.followup.send("📬 詳細を表示しました（このメッセージはあなただけに見えています）。", ephemeral=True)
+            else:
+                # ephemeralメッセージは編集できないので、その都度送信
+                await interaction.followup.send(embed=detail_embed, ephemeral=True)
 
     class HelpView(discord.ui.View):
         def __init__(self):
