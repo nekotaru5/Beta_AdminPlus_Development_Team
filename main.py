@@ -62,19 +62,20 @@ class ServerInfo(commands.Cog):
 
 
 # グローバル変数で保持
-white_users = {}
+white_users = []
 
-# 読み込み関数
 def load_white_users():
-    global white_users
     try:
         with open("WhiteUser.json", "r", encoding="utf-8") as f:
-            white_users = json.load(f)
+            data = json.load(f)
+            if not isinstance(data, list):
+                print("WhiteUser.jsonの形式がリストではありません。初期化します。")
+                return []
+            return data
     except Exception as e:
-        print(f"[WhiteUser] 読み込みエラー: {e}")
-        white_users = {}
+        print(f"[WhiteUser] ファイル読み込みエラー: {e}")
+        return []
 
-# 保存関数
 def save_white_users():
     with open("WhiteUser.json", "w", encoding="utf-8") as f:
         json.dump(white_users, f, indent=4)
