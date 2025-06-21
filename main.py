@@ -256,6 +256,61 @@ async def on_ready():
     print(f"{bot.user} としてログインしました")
     await send_log(bot, f"{bot.user} としてログインしました")
 # 更新履歴データ（同じままでOK）
+
+def build_help_embed():
+    embed = discord.Embed(
+        title="ヘルプ",
+        description="Botで使用できるコマンドの概要です。",
+        color=discord.Color.green()
+    )
+
+    embed.add_field(
+        name="■ 管理者専用",
+        value=(
+            "`/add_whitelist` - コマンド許可ロールを追加\n"
+            "`/whitelist` - コマンド許可ロール一覧を表示\n"
+            "`/delete_whitelist` - コマンド許可ロールを削除"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="■ 管理者 + 許可ロール",
+        value=(
+            "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
+            "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
+            "`/announcement_list` - 自動アナウンス公開リストを表示\n"
+            "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
+            "`/birthdaych_list` - 誕生日通知チャンネルを表示\n"
+            "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
+            "`/birthday_list` - 登録されている誕生日を表示します\n"
+            "`/add_birthdaylist` - 誕生日を登録します"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="■ 全ユーザー利用可",
+        value=(
+            "`/server_information` - サーバー情報を表示\n"
+            "`/user_information` - ユーザー情報を表示\n"
+            "`/support` - サポートサーバーの招待リンクを表示\n"
+            "`/help` - コマンドの詳細を表示\n"
+            "`!help` - コマンドの詳細を表示\n"
+            "`/add_birthdaylist` - 誕生日を登録します\n"
+            "`/birthday_list` - 登録されている誕生日を表示します"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="サポートサーバー",
+        value="[こちらをクリック](https://discord.gg/Yv9uJ32KkT)",
+        inline=False
+    )
+
+    return embed
+
 updates = [
    {
         "version": "1.1",
@@ -308,7 +363,7 @@ def build_update_embed():
     return embed
 
 # ✅ !update（従来のプレフィックスコマンド）
-@bot.command()
+@bot.command(name="update")
 async def update(ctx):
     embed = build_update_embed()
     try:
@@ -319,59 +374,12 @@ async def update(ctx):
 
 @bot.command(name="help")
 async def prefix_help(ctx):
-    embed = discord.Embed(
-        title="ヘルプ",
-        description="Botで使用できるコマンドの概要です。",
-        color=discord.Color.green()
-    )
-
-    embed.add_field(
-        name="■ 管理者専用",
-        value=(
-            "`/add_whitelist` - コマンド許可ロールを追加\n"
-            "`/whitelist` - コマンド許可ロール一覧を表示\n"
-            "`/delete_whitelist` - コマンド許可ロールを削除"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="■ 管理者 + 許可ロール",
-        value=(
-            "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
-            "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
-            "`/announcement_list` - 自動アナウンス公開リストを表示\n"
-            "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
-            "`/birthdaych_list` - 誕生日通知チャンネルを表示\n"
-            "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
-            "`/birthday_list` - 登録されている誕生日を表示します\n"
-            "`/add_birthdaylist` - 誕生日を登録します"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="■ 全ユーザー利用可",
-        value=(
-            "`/server_information` - サーバー情報を表示\n"
-            "`/user_information` - ユーザー情報を表示\n"
-            "`/support` - サポートサーバーの招待リンクを表示\n"
-            "`/help` - コマンドの詳細を表示\n"
-            "`!help` - コマンドの詳細を表示\n"
-            "`/add_birthdaylist` - 誕生日を登録します\n"
-            "`/birthday_list` - 登録されている誕生日を表示します"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="サポートサーバー",
-        value="[こちらをクリック](https://discord.gg/Yv9uJ32KkT)",
-        inline=False
-    )
-
-    await ctx.send(embed=embed)
-
+    embed = build_help_embed()
+    try:
+        await ctx.author.send(embed=embed)
+        await ctx.send("📩 ヘルプをDMで送りました！")
+    except discord.Forbidden:
+        await ctx.send("❌ ヘルプをDMで送れませんでした。DMの受信を許可してください。")
 
 # ✅ /update（新しいスラッシュコマンド）
 @bot.tree.command(name="dm", description="指定したユーザーにDMを送信します。")
@@ -420,7 +428,7 @@ async def set_log_channel(interaction: discord.Interaction, channel: discord.Tex
 @bot.tree.command(name="update", description="アップデート履歴を表示します")
 async def slash_update(interaction: discord.Interaction):
     embed = build_update_embed()
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.command()
 async def Admin(ctx):
@@ -812,60 +820,10 @@ async def support(interaction: discord.Interaction):
     embed.add_field(name="招待リンク", value="https://discord.gg/Yv9uJ32KkT")
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="help", description="コマンドの詳細を表示します。")
-async def help_command(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="ヘルプ",
-        description="Botで使用できるコマンドの概要です。",
-        color=discord.Color.green()
-    )
-
-    embed.add_field(
-        name="■ 管理者専用",
-        value=(
-            "`/add_whitelist` - コマンド許可ロールを追加\n"
-            "`/whitelist` - コマンド許可ロール一覧を表示\n"
-            "`/delete_whitelist` - コマンド許可ロールを削除"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="■ 管理者 + 許可ロール",
-        value=(
-            "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
-            "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
-            "`/announcement_list` - 自動アナウンス公開リストを表示\n"
-            "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
-            "`/birthdaych_list` - 誕生日通知チャンネルを表示\n"
-            "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
-            "`/birthday_list` - 登録されている誕生日を表示します\n"
-            "`/add_birthdaylist` - 誕生日を登録します"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="■ 全ユーザー利用可",
-        value=(
-            "`/server_information` - サーバー情報を表示\n"
-            "`/user_information` - ユーザー情報を表示\n"
-            "`/support` - サポートサーバーの招待リンクを表示\n"
-            "`/help` - コマンドの詳細を表示\n"
-            "`!help` - コマンドの詳細を表示\n"
-            "`/add_birthdaylist` - 誕生日を登録します\n"
-            "`/birthday_list` - 登録されている誕生日を表示します"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="サポートサーバー",
-        value="[こちらをクリック](https://discord.gg/Yv9uJ32KkT)",
-        inline=False
-    )
-
-    await interaction.response.send_message(embed=embed)
+@bot.tree.command(name="help", description="コマンド一覧を表示します")
+async def help(interaction: discord.Interaction):
+    embed = build_help_embed()
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -873,61 +831,14 @@ async def on_message(message: discord.Message):
         if message.author.bot:
             return
 
-        # メンションでヘルプ表示
+        # メンションでヘルプ表示（DM送信）
         if bot.user in message.mentions:
-            embed = discord.Embed(
-                title="コマンド一覧",
-                description="Botで使用できるコマンドの概要です。",
-                color=discord.Color.green()
-            )
-
-            embed.add_field(
-                name="■ 管理者専用",
-                value=(
-                    "`/add_whitelist` - コマンド許可ロールを追加\n"
-                    "`/whitelist` - コマンド許可ロール一覧を表示\n"
-                    "`/delete_whitelist` - コマンド許可ロールを削除"
-                ),
-                inline=False
-            )
-
-            embed.add_field(
-                name="■ 管理者 + 許可ロール",
-                value=(
-                    "`/message` - 指定チャンネルにメッセージ送信（メンション・改行可）\n"
-                    "`/add_announcement_list` - 自動アナウンス公開リストにチャンネルを追加\n"
-                    "`/announcement_list` - 自動アナウンス公開リストを表示\n"
-                    "`/delete_announcement_list` - 自動アナウンス公開リストからチャンネルを削除\n"
-                    "`/birthdaych_list ` - 誕生日通知チャンネルを表示\n"
-                    "`/setbirthdaych` - 誕生日通知チャンネルを登録・解除\n"
-                    "`/birthday_list` - 登録されている誕生日を表示します\n"
-                    "`/add_birthdaylist` - 誕生日を登録します"
-                ),
-                inline=False
-            )
-
-            embed.add_field(
-                name="■ 全ユーザー利用可",
-                value=(
-                    "`/server_information` - サーバー情報を表示\n"
-                    "`/user_information` - ユーザー情報を表示\n"
-                    "`/support` - サポートサーバーの招待リンクを表示\n"
-                    "`/help` - コマンドの詳細を表示\n"
-                    "`!help` - コマンドの詳細を表示\n"
-                    "`/add_birthdaylist` - 誕生日を登録します\n"
-                    "`/birthday_list` - 登録されている誕生日を表示します"
-                ),
-                inline=False
-            )
-
-            embed.add_field(
-                name="サポートサーバー",
-                value="[こちらをクリック](https://discord.gg/Yv9uJ32KkT)",
-                inline=False
-            )
-
-            embed.set_footer(text="ご不明点等がございましたら、サポートサーバーまでお問い合わせください。")
-            await message.channel.send(embed=embed)
+            embed = build_help_embed()
+            try:
+                await message.author.send(embed=embed)
+                await message.channel.send("📩 ヘルプをDMで送りました！")
+            except discord.Forbidden:
+                await message.channel.send("❌ ヘルプをDMで送れませんでした。DMの受信を許可してください。")
 
         # アナウンス公開処理
         if message.guild:
