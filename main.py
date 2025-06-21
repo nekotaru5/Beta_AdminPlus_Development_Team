@@ -283,7 +283,7 @@ def build_help_embed_and_view_ephemeral():
     class HelpSelect(discord.ui.Select):
         def __init__(self, parent_view: discord.ui.View):
             options = [
-                discord.SelectOption(label="■ ヘルプに戻る", value="help", description="最初のコマンド一覧に戻る"),
+                discord.SelectOption(label="■ ヘルプに戻る", value="help", description="最初のコマンド一覧に戻る", default=True),
                 discord.SelectOption(label="■ 管理者専用", value="admin", description="管理者専用のコマンド一覧"),
                 discord.SelectOption(label="■ 管理者 + 許可ロール", value="authorized", description="許可された人のコマンド一覧"),
                 discord.SelectOption(label="■ 全ユーザー利用可", value="everyone", description="誰でも使えるコマンド一覧")
@@ -325,6 +325,7 @@ def build_help_embed_and_view_ephemeral():
                 embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
                 embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
 
+            # Embedを編集して表示（非公開レスポンス）
             await interaction.response.edit_message(embed=embed, view=self.parent_view)
 
     class HelpView(discord.ui.View):
@@ -333,9 +334,8 @@ def build_help_embed_and_view_ephemeral():
             self.select = HelpSelect(self)
             self.add_item(self.select)
 
-    view = HelpView()
-    return main_help_embed(), view
-
+    # 最初の状態を返す（embedとview）
+    return main_help_embed(), HelpView()
 
 # ──────────────
 # 公開用ヘルプ（編集可能メッセージを使う）
