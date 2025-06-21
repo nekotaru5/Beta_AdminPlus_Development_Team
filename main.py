@@ -231,12 +231,13 @@ async def before_birthday_check():
 
 @bot.event
 async def on_ready():
-    global allowed_roles, announcement_channels, birthday_list, birthday_channels,log_channels
+    global allowed_roles, announcement_channels, birthday_list, birthday_channels,log_channels,white_users
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
     birthday_list = load_birthday_list()
     birthday_channels = load_birthday_channels()
     log_channels = load_log_channels()
+    white_users = load_white_users()
 
     if not check_birthdays.is_running():  # ここで起動
         check_birthdays.start()
