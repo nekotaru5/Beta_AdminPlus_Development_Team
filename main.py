@@ -266,21 +266,24 @@ def build_help_embed_and_view_ephemeral():
     import discord
 
     # 最初のヘルプEmbed（コマンド一覧）
-    embed = discord.Embed(
-        title="コマンド一覧",
-        description="カテゴリを選んで、使用可能なコマンドを確認してください。",
-        color=0x3498db
-    )
-    embed.add_field(
-        name="🔗 サポートサーバー",
-        value="[こちらを押してください](https://discord.gg/ku8gdut5U2) でサポートサーバーに参加できます。",
-        inline=False
-    )
-    embed.set_footer(text="不明点があればサポートサーバーをご利用ください。")
+    def main_help_embed():
+        embed = discord.Embed(
+            title="コマンド一覧",
+            description="カテゴリを選んで、使用可能なコマンドを確認してください。",
+            color=0x3498db
+        )
+        embed.add_field(
+            name="🔗 サポートサーバー",
+            value="[こちらを押してください](https://discord.gg/ku8gdut5U2) でサポートサーバーに参加できます。",
+            inline=False
+        )
+        embed.set_footer(text="不明点があればサポートサーバーをご利用ください。")
+        return embed
 
     class HelpSelect(discord.ui.Select):
         def __init__(self, parent_view: discord.ui.View):
             options = [
+                discord.SelectOption(label="■ ヘルプに戻る", value="help", description="最初のコマンド一覧に戻る"),
                 discord.SelectOption(label="■ 管理者専用", value="admin", description="管理者専用のコマンド一覧"),
                 discord.SelectOption(label="■ 管理者 + 許可ロール", value="authorized", description="許可された人のコマンド一覧"),
                 discord.SelectOption(label="■ 全ユーザー利用可", value="everyone", description="誰でも使えるコマンド一覧")
@@ -296,33 +299,33 @@ def build_help_embed_and_view_ephemeral():
         async def callback(self, interaction: discord.Interaction):
             category = self.values[0]
 
-            if category == "admin":
-                detail_embed = discord.Embed(title="■ 管理者専用コマンド", color=0xff5555)
-                detail_embed.add_field(name="/add_whitelist", value="コマンド許可ロールを追加", inline=False)
-                detail_embed.add_field(name="/whitelist", value="コマンド許可ロール一覧を表示", inline=False)
-                detail_embed.add_field(name="/delete_whitelist", value="コマンド許可ロールを削除", inline=False)
-
+            if category == "help":
+                embed = main_help_embed()
+            elif category == "admin":
+                embed = discord.Embed(title="■ 管理者専用コマンド", color=0xff5555)
+                embed.add_field(name="/add_whitelist", value="コマンド許可ロールを追加", inline=False)
+                embed.add_field(name="/whitelist", value="コマンド許可ロール一覧を表示", inline=False)
+                embed.add_field(name="/delete_whitelist", value="コマンド許可ロールを削除", inline=False)
             elif category == "authorized":
-                detail_embed = discord.Embed(title="■ 管理者 + 許可ロール", color=0xffaa00)
-                detail_embed.add_field(name="/message", value="指定チャンネルにメッセージ送信（メンション・改行可）", inline=False)
-                detail_embed.add_field(name="/add_announcement_list", value="自動アナウンス公開リストにチャンネルを追加", inline=False)
-                detail_embed.add_field(name="/announcement_list", value="自動アナウンス公開リストを表示", inline=False)
-                detail_embed.add_field(name="/delete_announcement_list", value="自動アナウンス公開リストからチャンネルを削除", inline=False)
-                detail_embed.add_field(name="/birthdaych_list", value="誕生日通知チャンネルを表示", inline=False)
-                detail_embed.add_field(name="/setbirthdaych", value="誕生日通知チャンネルを登録・解除", inline=False)
-                detail_embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
-                detail_embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
-
+                embed = discord.Embed(title="■ 管理者 + 許可ロール", color=0xffaa00)
+                embed.add_field(name="/message", value="指定チャンネルにメッセージ送信（メンション・改行可）", inline=False)
+                embed.add_field(name="/add_announcement_list", value="自動アナウンス公開リストにチャンネルを追加", inline=False)
+                embed.add_field(name="/announcement_list", value="自動アナウンス公開リストを表示", inline=False)
+                embed.add_field(name="/delete_announcement_list", value="自動アナウンス公開リストからチャンネルを削除", inline=False)
+                embed.add_field(name="/birthdaych_list", value="誕生日通知チャンネルを表示", inline=False)
+                embed.add_field(name="/setbirthdaych", value="誕生日通知チャンネルを登録・解除", inline=False)
+                embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
+                embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
             elif category == "everyone":
-                detail_embed = discord.Embed(title="■ 全ユーザー利用可", color=0x55ff55)
-                detail_embed.add_field(name="/server_information", value="サーバー情報を表示", inline=False)
-                detail_embed.add_field(name="/user_information", value="ユーザー情報を表示", inline=False)
-                detail_embed.add_field(name="/support", value="サポートサーバーのURLを表示", inline=False)
-                detail_embed.add_field(name="/help または !help", value="コマンドの詳細を表示", inline=False)
-                detail_embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
-                detail_embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
+                embed = discord.Embed(title="■ 全ユーザー利用可", color=0x55ff55)
+                embed.add_field(name="/server_information", value="サーバー情報を表示", inline=False)
+                embed.add_field(name="/user_information", value="ユーザー情報を表示", inline=False)
+                embed.add_field(name="/support", value="サポートサーバーのURLを表示", inline=False)
+                embed.add_field(name="/help または !help", value="コマンドの詳細を表示", inline=False)
+                embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
+                embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
 
-            await interaction.response.edit_message(embed=detail_embed, view=self.parent_view)
+            await interaction.response.edit_message(embed=embed, view=self.parent_view)
 
     class HelpView(discord.ui.View):
         def __init__(self):
@@ -330,27 +333,9 @@ def build_help_embed_and_view_ephemeral():
             self.select = HelpSelect(self)
             self.add_item(self.select)
 
-            self.back_button = discord.ui.Button(label="ヘルプに戻る", style=discord.ButtonStyle.gray)
-            self.back_button.callback = self.back_to_main
-            self.add_item(self.back_button)
-
-        async def back_to_main(self, interaction: discord.Interaction):
-            embed = discord.Embed(
-                title="コマンド一覧",
-                description="カテゴリを選んで、使用可能なコマンドを確認してください。",
-                color=0x3498db
-            )
-            embed.add_field(
-                name="🔗 サポートサーバー",
-                value="[こちらを押してください](https://discord.gg/ku8gdut5U2) でサポートサーバーに参加できます。",
-                inline=False
-            )
-            embed.set_footer(text="不明点があればサポートサーバーをご利用ください。")
-
-            await interaction.response.edit_message(embed=embed, view=self)
-
     view = HelpView()
-    return embed, view
+    return main_help_embed(), view
+
 
 # ──────────────
 # 公開用ヘルプ（編集可能メッセージを使う）
