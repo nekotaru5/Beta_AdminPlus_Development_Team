@@ -258,11 +258,11 @@ async def on_ready():
 # 更新履歴データ（同じままでOK）
 
 # グローバルで非公開メッセージ保持（Bot起動中だけ）
-b_message_private = None
 
+
+# ──────────────
+# 非公開用（ephemeral）ヘルプ
 def build_help_embed_and_view_private():
-    import discord
-
     embed = discord.Embed(
         title="コマンド一覧",
         description="カテゴリを選んで、使用可能なコマンドを確認してください。",
@@ -291,7 +291,6 @@ def build_help_embed_and_view_private():
             self.parent_view = parent_view
 
         async def callback(self, interaction: discord.Interaction):
-            global b_message_private
             category = self.values[0]
 
             if category == "admin":
@@ -320,14 +319,8 @@ def build_help_embed_and_view_private():
                 detail_embed.add_field(name="/add_birthdaylist", value="誕生日を登録", inline=False)
                 detail_embed.add_field(name="/birthday_list", value="登録されている誕生日を表示", inline=False)
 
-            # ephemeralは編集不可なのでフォローアップで返すのみ
-            await interaction.response.defer(ephemeral=True)
-            if b_message_private is None:
-                await interaction.followup.send(embed=detail_embed, ephemeral=True)
-                # ephemeralメッセージは編集できないので変数保存不要
-            else:
-                # ここは使わないかもしれません。ephemeralはメッセージ編集不可。
-                pass
+            # ephemeralは編集不可なので新規送信のみ
+            await interaction.response.send_message(embed=detail_embed, ephemeral=True)
 
     class HelpView(discord.ui.View):
         def __init__(self):
@@ -337,16 +330,11 @@ def build_help_embed_and_view_private():
     view = HelpView()
     return embed, view
 
-
-
 # ──────────────
-
-# グローバルで公開メッセージ保持
-b_message_public = None
+# 公開用ヘルプ（編集可能メッセージを使う）
+b_message_public = None  # グローバル変数でメッセージ保持
 
 def build_help_embed_and_view_public():
-    import discord
-
     embed = discord.Embed(
         title="コマンド一覧",
         description="カテゴリを選んで、使用可能なコマンドを確認してください。",
@@ -420,6 +408,7 @@ def build_help_embed_and_view_public():
 
     view = HelpView()
     return embed, view
+
 
 # バージョン情報リスト
 updates = [
@@ -554,12 +543,12 @@ async def update(ctx):
 
 @bot.command(name="help")
 async def help(ctx):
-    embed, view = build_helpb_embed_and_view()
+    embed, view = build_help_embed_and_view_public()  # 公開用の関数を呼ぶ
     try:
         dm_channel = await ctx.author.create_dm()
         await dm_channel.send(embed=embed, view=view)
     except discord.Forbidden:
-        # DMが拒否されている場合は無視
+        # DM拒否されてたら無視（通知もしない）
         pass
 
 # ✅ /update（新しいスラッシュコマンド）
@@ -1003,7 +992,7 @@ async def support(interaction: discord.Interaction):
 
 @bot.tree.command(name="help", description="コマンド一覧を表示します")
 async def help(interaction: discord.Interaction):
-    embed, view = build_help_embed_and_view_ephemeral()
+    embed, view = build_help_embed_and_view()  # 非公開用の関数名に合わせてください
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.event
@@ -1014,7 +1003,7 @@ async def on_message(message: discord.Message):
 
         # メンションでヘルプ表示（DM送信）
         if bot.user in message.mentions:
-            embed, view = build_helpb_embed_and_view()
+            embed, view = build_help_embed_and_view_public()
             try:
                 await message.author.send(embed=embed, view=view)
             except discord.Forbidden:
