@@ -405,10 +405,8 @@ def build_help_embed_and_view_public():
 
             if b_message_public is None:
                 b_message_public = await interaction.channel.send(embed=detail_embed)
-                await interaction.followup.send("詳細を表示しました。", ephemeral=True)
             else:
                 await b_message_public.edit(embed=detail_embed)
-                await interaction.followup.send("詳細を更新しました。", ephemeral=True)
 
     class HelpView(discord.ui.View):
         def __init__(self):
