@@ -264,7 +264,7 @@ async def on_ready():
 # 非公開用（ephemeral）ヘルプ
 b_message_private = None  # グローバルで保持（ただしephemeralでは編集不可）
 
-def build_help_embed_and_view_private():
+def build_help_embed_and_view():
     embed = discord.Embed(
         title="コマンド一覧",
         description="カテゴリを選んで、使用可能なコマンドを確認してください。",
