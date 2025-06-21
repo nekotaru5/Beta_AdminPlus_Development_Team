@@ -392,7 +392,7 @@ async def update(ctx):
     except discord.Forbidden:
         await ctx.send("DMを送れませんでした。DM受信を許可してください。")
 
-@bot.command(help)
+@bot.command(name="help")
 async def help(ctx):
     embed, view = build_help_embed_and_view()
     try:
