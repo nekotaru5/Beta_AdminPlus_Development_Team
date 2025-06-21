@@ -311,7 +311,11 @@ def build_update_embed():
 @bot.command()
 async def update(ctx):
     embed = build_update_embed()
-    await ctx.send(embed=embed)
+    try:
+        await ctx.author.send(embed=embed)  # 実行者のDMに送る
+        await ctx.send("アップデート情報をDMで送りました！")
+    except discord.Forbidden:
+        await ctx.send("DMを送れませんでした。DM受信を許可してください。")
 
 @bot.command(name="help")
 async def prefix_help(ctx):
