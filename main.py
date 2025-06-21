@@ -373,11 +373,11 @@ async def prefix_help(ctx):
 @bot.tree.command(name="dm", description="指定したユーザーにDMを送信します。")
 @app_commands.describe(user="DMを送る相手", message="送信するメッセージ")
 async def dm(interaction: discord.Interaction, user: discord.User, message: str):
-    if "allowed_users" not in white_users:
+    if not white_users:
         await interaction.response.send_message("⚠️ ホワイトリストがロードされていません。", ephemeral=True)
         return
 
-    if interaction.user.id not in white_users["allowed_users"]:
+    if interaction.user.id not in white_users:
         await interaction.response.send_message("❌ あなたにはこのコマンドを使う権限がありません。", ephemeral=True)
         return
 
