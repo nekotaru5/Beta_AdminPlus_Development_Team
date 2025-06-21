@@ -842,8 +842,8 @@ async def support(interaction: discord.Interaction):
 
 @bot.tree.command(name="help", description="コマンド一覧を表示します")
 async def help(interaction: discord.Interaction):
-    embed = build_help_embed()
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    embed, view = build_help_embed_and_view()
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @bot.event
 async def on_message(message: discord.Message):
@@ -853,12 +853,11 @@ async def on_message(message: discord.Message):
 
         # メンションでヘルプ表示（DM送信）
         if bot.user in message.mentions:
-            embed = build_help_embed()
+            embed, view = build_help_embed_and_view()
             try:
-                await message.author.send(embed=embed)
-                await message.channel.send("📩 ヘルプをDMで送りました！")
+                await message.author.send(embed=embed, view=view)
             except discord.Forbidden:
-                await message.channel.send("❌ ヘルプをDMで送れませんでした。DMの受信を許可してください。")
+                pass  # DM送信失敗は無視
 
         # アナウンス公開処理
         if message.guild:
