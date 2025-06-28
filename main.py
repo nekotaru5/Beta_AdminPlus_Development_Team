@@ -299,8 +299,9 @@ class ServerListView(discord.ui.View):
         )
 
         for g in chunk:
-            name = f"🖼️ {g.name}"
-            value = f"👥 メンバー数: {g.member_count}\n🚀 ブースト: {g.premium_tier}"
+            icon_url = g.icon.url if g.icon else "https://cdn.discordapp.com/embed/avatars/0.png"
+            name = f"**[{g.name}]({icon_url})**"
+            value = f"👥 メンバー数: {g.member_count}\n🚀 ブースト数 / レベル: {g.premium_subscription_count} / {g.premium_tier}"
             embed.add_field(name=name, value=value, inline=False)
 
         embed.set_footer(text=f"ページ {self.page + 1} / {((len(self.guilds) - 1) // self.per_page) + 1}")
@@ -325,7 +326,6 @@ class ServerListView(discord.ui.View):
         self.page += 1
         self.update_buttons()
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
-
 
 
 # ──────────────
