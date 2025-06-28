@@ -283,10 +283,7 @@ class ServerListView(discord.ui.View):
         self.guilds = guilds
         self.user = user
         self.page = 0
-        self.per_page = 10  # 25は多すぎてボタンが押しづらくなるので10推奨
-
-        # 最初の表示を更新
-        self.update_buttons()
+        self.per_page = 10
 
     def get_page_embed(self):
         start = self.page * self.per_page
@@ -300,7 +297,7 @@ class ServerListView(discord.ui.View):
 
         for g in chunk:
             icon_url = g.icon.url if g.icon else "https://cdn.discordapp.com/embed/avatars/0.png"
-            name = f"**{g.name}**"  # 名前は太字のみ
+            name = f"**{g.name}**"
             value = f"[サーバーアイコン]({icon_url})\n👥 メンバー数: {g.member_count}\n🚀 ブースト数:{g.premium_subscription_count}回 / レベル:{g.premium_tier}レベル"
             embed.add_field(name=name, value=value, inline=False)
 
@@ -308,11 +305,15 @@ class ServerListView(discord.ui.View):
         return embed
 
     def update_buttons(self):
-        self.prev_button.disabled = self.page == 0
-        self.next_button.disabled = (self.page + 1) * self.per_page >= len(self.guilds)
+        # ボタンが存在する前に呼ばれないようにする
+        for item in self.children:
+            if isinstance(item, discord.ui.Button):
+                if item.label == "◀ 戻る":
+                    item.disabled = self.page == 0
+                elif item.label == "次へ ▶":
+                    item.disabled = (self.page + 1) * self.per_page >= len(self.guilds)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        # 他人からの操作は禁止
         return interaction.user.id == self.user.id
 
     @discord.ui.button(label="◀ 戻る", style=discord.ButtonStyle.secondary, disabled=True)
@@ -326,7 +327,6 @@ class ServerListView(discord.ui.View):
         self.page += 1
         self.update_buttons()
         await interaction.response.edit_message(embed=self.get_page_embed(), view=self)
-
 
 # ──────────────
 # 非公開用（ephemeral）ヘルプ
