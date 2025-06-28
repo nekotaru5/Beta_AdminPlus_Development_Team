@@ -671,6 +671,41 @@ async def help(ctx):
         pass
 
 # ✅ /update（新しいスラッシュコマンド）
+
+@bot.tree.command(name="update_message", description="すべてのアップデートチャンネルに一斉送信（ホワイトユーザーのみ）")
+@app_commands.describe(message="送信する内容（改行・メンション可）")
+async def update_message(interaction: discord.Interaction, message: str):
+    # ホワイトユーザー制限
+    if str(interaction.user.id) not in map(str, white_users):
+        await interaction.response.send_message(
+            "❌ あなたにはこのコマンドを実行する権限がありません（ホワイトユーザー専用）。",
+            ephemeral=True
+        )
+        return
+
+    # メッセージ送信処理
+    count = 0
+    for guild_id, channel_id in update_channels.items():
+        guild = bot.get_guild(int(guild_id))
+        if not guild:
+            continue
+        channel = guild.get_channel(channel_id)
+        if not channel:
+            continue
+        try:
+            await channel.send(message)
+            count += 1
+        except Exception as e:
+            print(f"[エラー] {guild_id} の送信に失敗: {e}")
+
+    await interaction.response.send_message(
+        f"✅ {count} チャンネルにメッセージを送信しました。",
+        ephemeral=True
+    )
+
+    # ログ出力
+    print(f"✅ {interaction.user} が /update_message を実行し、{count} チャンネルに送信しました。")
+
 @bot.tree.command(name="updatech", description="アップデートチャンネルを設定（管理者または許可ロールのみ）")
 @app_commands.describe(channel="送信先チャンネル")
 async def updatech(interaction: discord.Interaction, channel: discord.TextChannel):
