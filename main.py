@@ -671,6 +671,31 @@ async def help(ctx):
         pass
 
 # ✅ /update（新しいスラッシュコマンド）
+@bot.tree.command(name="updatech", description="アップデートチャンネルを設定（管理者または許可ロールのみ）")
+@app_commands.describe(channel="送信先チャンネル")
+async def updatech(interaction: discord.Interaction, channel: discord.TextChannel):
+    global update_channels
+
+    if not await check_permissions(interaction):
+        await interaction.response.send_message(
+            "❌ このコマンドを実行する権限がありません（管理者または許可ロール限定）。",
+            ephemeral=True
+        )
+        return
+
+    guild_id = str(interaction.guild_id)
+    update_channels[guild_id] = channel.id
+    save_update_channels()
+
+    # ユーザーへの返信
+    await interaction.response.send_message(
+        f"✅ アップデートチャンネルを {channel.mention} に設定しました。",
+        ephemeral=True
+    )
+
+    # ✅ コンソールログ出力
+    print(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
+
 
 @bot.tree.command(name="server_list", description="Botが参加しているサーバー一覧を表示（ページ付き）")
 async def server_list(interaction: discord.Interaction):
