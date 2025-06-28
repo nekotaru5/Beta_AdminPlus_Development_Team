@@ -289,24 +289,25 @@ class ServerListView(discord.ui.View):
         self.update_buttons()
 
     def get_page_embed(self):
-        start = self.page * self.per_page
-        end = start + self.per_page
-        chunk = self.guilds[start:end]
+    start = self.page * self.per_page
+    end = start + self.per_page
+    chunk = self.guilds[start:end]
 
-        embed = discord.Embed(
-            title=f"Botが参加しているサーバー一覧 ({len(self.guilds)}個中 {start+1}〜{min(end, len(self.guilds))})",
-            color=discord.Color.green()
-        )
+    embed = discord.Embed(
+        title=f"Botが参加しているサーバー一覧 ({len(self.guilds)}個中 {start+1}〜{min(end, len(self.guilds))})",
+        color=discord.Color.green()
+    )
 
-        for g in chunk:
-    icon_url = g.icon.url if g.icon else "https://cdn.discordapp.com/embed/avatars/0.png"
-    name = f"**{g.name}**"  # 名前は太字のみ
-    value = f"[サーバーアイコン]({icon_url})\n👥 メンバー数: {g.member_count}\n🚀 ブースト数 / レベル: {g.premium_subscription_count} / {g.premium_tier}"
-    embed.add_field(name=name, value=value, inline=False)
+    for g in chunk:
+        icon_url = g.icon.url if g.icon else "https://cdn.discordapp.com/embed/avatars/0.png"
+        name = f"**{g.name}**"  # 名前は太字のみ
+        value = f"[サーバーアイコン]({icon_url})\n👥 メンバー数: {g.member_count}\n🚀 ブースト数 / レベル: {g.premium_subscription_count} / {g.premium_tier}"
+        embed.add_field(name=name, value=value, inline=False)
 
-        embed.set_footer(text=f"ページ {self.page + 1} / {((len(self.guilds) - 1) // self.per_page) + 1}")
-        return embed
+    embed.set_footer(text=f"ページ {self.page + 1} / {((len(self.guilds) - 1) // self.per_page) + 1}")
+    return embed
 
+        
     def update_buttons(self):
         self.prev_button.disabled = self.page == 0
         self.next_button.disabled = (self.page + 1) * self.per_page >= len(self.guilds)
