@@ -857,7 +857,7 @@ async def Admin(ctx):
     await ctx.send('呼びましたか？(⁎˃ᴗ˂⁎)')
 
 #　誕生日管理コマンド
-@bot.tree.command(name="setbirthdaych", description="誕生日アナウンス用チャンネルを登録または解除します")
+@bot.tree.command(name="【beta】setbirthdaych", description="誕生日アナウンス用チャンネルを登録または解除します")
 @app_commands.describe(channel="誕生日アナウンスを行うチャンネル")
 async def set_birthday_channel(interaction: discord.Interaction, channel: discord.TextChannel):
     try:
@@ -915,7 +915,7 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
     print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
     await send_log(bot, f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
 
-@bot.tree.command(name="delete_birthdaylist", description="誕生日を削除します")
+@bot.tree.command(name="【beta】delete_birthdaylist", description="誕生日を削除します")
 @app_commands.describe(user="削除するユーザー")
 async def delete_birthdaylist(interaction: discord.Interaction, user: discord.User):
     if not await can_modify_birthday(interaction, user.id):
