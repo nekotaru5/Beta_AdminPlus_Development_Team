@@ -749,7 +749,7 @@ async def update_message(interaction: discord.Interaction, message: str):
 
     # ログ出力
     print(f"✅ {interaction.user} が /update_message を実行し、{count} チャンネルに送信しました。")
-
+    await send_log(bot, f"✅ {interaction.user} が /update_message を実行し、{count} チャンネルに送信しました。")
 @bot.tree.command(name="updatech", description="アップデートチャンネルを設定（管理者または許可ロールのみ）")
 @app_commands.describe(channel="送信先チャンネル")
 async def updatech(interaction: discord.Interaction, channel: discord.TextChannel):
@@ -870,7 +870,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
                 return
     except Exception as e:
         print(f"[setbirthdaych] 権限チェックエラー: {e}")
-        await send_log(f"[setbirthdaych] 権限チェックエラー: {e}")
+        await send_log(bot, f"[setbirthdaych] 権限チェックエラー: {e}")
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
@@ -887,7 +887,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
     else:
         if existing_channel_id is not None:
             print(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
-            await send_log(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
+            await send_log(bot, f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
         else:
             print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
             await send_log(bot, f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
@@ -973,7 +973,7 @@ async def birthdaych_list(interaction: discord.Interaction):
                 return
     except Exception as e:
         print(f"[birthdaych_list] 権限チェックエラー: {e}")
-        await send_log(f"[birthdaych_list] 権限チェックエラー: {e}")
+        await send_log(bot, f"[birthdaych_list] 権限チェックエラー: {e}")
         await interaction.response.send_message("権限の確認中にエラーが発生しました。", ephemeral=True)
         return
 
@@ -1015,7 +1015,6 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
-        await send_log(f"権限チェックエラー: {e}")
         return
 
     guild_id = str(interaction.guild_id)
@@ -1026,7 +1025,7 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
         allowed_roles[guild_id].append(role.id)
         save_allowed_roles()
         print(f"[{guild_id}] でロール {role.id} が追加されました")
-        await send_log(f"[{guild_id}] でロール {role.id} が追加されました") # ← ここ追加
+        await send_log(bot, f"[{guild_id}] でロール {role.id} が追加されました") # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールに追加しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は既に許可ロールです", ephemeral=True)
@@ -1043,7 +1042,6 @@ async def delete_whitelist(interaction: discord.Interaction, role: discord.Role)
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
-        await send_log(f"権限チェックエラー: {e}")
         return
 
     guild_id = str(interaction.guild_id)
@@ -1110,7 +1108,7 @@ async def delete_announcement_list(interaction: discord.Interaction, channel: di
         announcement_channels[guild_id].remove(channel.id)
         save_announcement_channels()
         print(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました")
-        await send_log(f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました") # ← 追加
+        await send_log(bot, f"[{guild_id}] でチャンネルID {channel.id} がアナウンスリストから削除されました") # ← 追加
         await interaction.response.send_message(f"{channel.mention} を自動アナウンス公開リストから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{channel.mention} は自動アナウンス公開リストに含まれていません。", ephemeral=True)
@@ -1272,14 +1270,13 @@ async def on_message(message: discord.Message):
                     await message.add_reaction("👎")
                 except discord.errors.Forbidden:
                     print(f"権限不足でメッセージの公開またはリアクションの追加に失敗 (Channel: {message.channel.id})")
-                    await send_log(f"権限不足でメッセージの公開またはリアクションの追加に失敗 (Channel: {message.channel.id})")
+                    await send_log(bot, f"権限不足でメッセージの公開またはリアクションの追加に失敗 (Channel: {message.channel.id})")
                 except Exception as e:
                     print(f"メッセージの処理中にエラーが発生: {e}")
-                    await send_log(f"メッセージの処理中にエラーが発生: {e}")
 
     except Exception as e:
         print(f"on_messageイベントでエラーが発生: {e}")
-        await send_log(f"on_messageイベントでエラーが発生: {e}")
+        await send_log(bot, f"on_messageイベントでエラーが発生: {e}")
 
     await bot.process_commands(message)
 
