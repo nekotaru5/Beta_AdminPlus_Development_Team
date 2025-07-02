@@ -63,6 +63,21 @@ class ServerInfo(commands.Cog):
 
 # グローバル変数で保持
 
+# 通報チャンネル（ギルドID: チャンネルID）
+report_channels = {}
+
+def load_report_channels():
+    try:
+        with open("report_channels.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[report_channels] 読み込みエラー: {e}")
+        return {}
+
+def save_report_channels():
+    with open("report_channels.json", "w", encoding="utf-8") as f:
+        json.dump(report_channels, f, indent=4)
+
 update_channels = {}
 
 def load_update_channels():
@@ -263,7 +278,7 @@ async def before_birthday_check():
 @bot.event
 async def on_ready():
     global allowed_roles, announcement_channels, birthday_list, birthday_channels
-    global log_channels, white_users, update_channels
+    global log_channels, white_users, update_channels,report_channels
 
     allowed_roles = load_allowed_roles()
     announcement_channels = load_announcement_channels()
