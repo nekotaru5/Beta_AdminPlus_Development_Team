@@ -667,7 +667,7 @@ def build_update_embed_and_view_public():
 
 # ✅ !update（従来のプレフィックスコマンド）
 
-@bot.tree.context_menu(name="【beta】メッセージを通報する")
+@bot.tree.context_menu(name="beta_メッセージを通報する")
 async def report_message(interaction: discord.Interaction, message: discord.Message):
     guild_id = str(interaction.guild_id)
     report_channel_id = report_channels.get(guild_id)
@@ -716,7 +716,7 @@ async def help(ctx):
 
 # ✅ /update（新しいスラッシュコマンド）
 
-@bot.tree.command(name="【beta】update_message", description="すべてのアップデートチャンネルに一斉送信（ホワイトユーザーのみ）")
+@bot.tree.command(name="beta_update_message", description="すべてのアップデートチャンネルに一斉送信（ホワイトユーザーのみ）")
 @app_commands.describe(message="送信する内容（改行・メンション可）")
 async def update_message(interaction: discord.Interaction, message: str):
     # ホワイトユーザー制限
@@ -776,7 +776,7 @@ async def updatech(interaction: discord.Interaction, channel: discord.TextChanne
     print(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
     await send_log(bot, f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
 
-@bot.tree.command(name="server_list", description="Botが参加しているサーバー一覧を表示（ページ付き）")
+@bot.tree.command(name="beta_server_list", description="Botが参加しているサーバー一覧を表示（ページ付き）")
 async def server_list(interaction: discord.Interaction):
     guilds = bot.guilds
     view = ServerListView(guilds, interaction.user)
@@ -788,7 +788,7 @@ async def server_list(interaction: discord.Interaction):
     )
 
 
-@bot.tree.command(name="【beta】dm", description="指定したユーザーにDMを送信します。")
+@bot.tree.command(name="beta_dm", description="指定したユーザーにDMを送信します。")
 @app_commands.describe(user="DMを送る相手", message="送信するメッセージ")
 async def dm(interaction: discord.Interaction, user: discord.User, message: str):
     if not white_users:
@@ -810,7 +810,7 @@ async def dm(interaction: discord.Interaction, user: discord.User, message: str)
         await interaction.response.send_message(f"❌ エラーが発生しました: {e}", ephemeral=True)
         print(f"[エラー] {interaction.user} → {user}：{e}")
 
-@tree.command(name="logch", description="ログ送信先チャンネルを設定します（管理者または許可ロール限定）")
+@tree.command(name="beta_logch", description="ログ送信先チャンネルを設定します（管理者または許可ロール限定）")
 @app_commands.describe(channel="ログを送信するチャンネル")
 async def set_log_channel(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
@@ -831,7 +831,7 @@ async def set_log_channel(interaction: discord.Interaction, channel: discord.Tex
         await send_log(bot, f"⚠️ [{guild_id}] で、[{channel.id}] にログチャンネルが上書きされました。")
         await interaction.response.send_message(f"⚠️ ログチャンネルを上書きしました： {channel.mention}", ephemeral=True)
 
-@bot.tree.command(name="set_report_channel", description="通報チャンネルを設定します（管理者または許可ロール限定）")
+@bot.tree.command(name="beta_reportch", description="通報チャンネルを設定します（管理者または許可ロール限定）")
 async def set_report_channel(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
         await interaction.response.send_message("❌ このコマンドを実行する権限がありません。", ephemeral=True)
@@ -857,7 +857,7 @@ async def Admin(ctx):
     await ctx.send('呼びましたか？(⁎˃ᴗ˂⁎)')
 
 #　誕生日管理コマンド
-@bot.tree.command(name="【beta】setbirthdaych", description="誕生日アナウンス用チャンネルを登録または解除します")
+@bot.tree.command(name="beta_birthdaych", description="誕生日アナウンス用チャンネルを登録または解除します")
 @app_commands.describe(channel="誕生日アナウンスを行うチャンネル")
 async def set_birthday_channel(interaction: discord.Interaction, channel: discord.TextChannel):
     try:
@@ -896,7 +896,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
         save_birthday_channels()
         await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルに登録しました。", ephemeral=True)
 
-@bot.tree.command(name="add_birthdaylist", description="誕生日を登録します")
+@bot.tree.command(name="beta_add_birthdaylist", description="誕生日を登録します")
 @app_commands.describe(user="登録するユーザー", birthday="誕生日 (YYYY-MM-DD)")
 async def add_birthdaylist(interaction: discord.Interaction, user: discord.User, birthday: str):
     if not await can_modify_birthday(interaction, user.id):
@@ -915,7 +915,7 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
     print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
     await send_log(bot, f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
 
-@bot.tree.command(name="【beta】delete_birthdaylist", description="誕生日を削除します")
+@bot.tree.command(name="beta_delete_birthdaylist", description="誕生日を削除します")
 @app_commands.describe(user="削除するユーザー")
 async def delete_birthdaylist(interaction: discord.Interaction, user: discord.User):
     if not await can_modify_birthday(interaction, user.id):
@@ -931,7 +931,7 @@ async def delete_birthdaylist(interaction: discord.Interaction, user: discord.Us
     else:
         await interaction.response.send_message(f"{user.mention} は誕生日リストに登録されていません。", ephemeral=True)
 
-@bot.tree.command(name="birthday_list", description="登録されている誕生日リストを表示します")
+@bot.tree.command(name="beta_birthday_list", description="登録されている誕生日リストを表示します")
 async def show_birthday_list(interaction: discord.Interaction):
     guild = interaction.guild
     if not guild:
@@ -961,7 +961,7 @@ async def show_birthday_list(interaction: discord.Interaction):
         await interaction.response.send_message("このサーバーには登録されている誕生日がありません。", ephemeral=True)
     else:
         await interaction.response.send_message(message, ephemeral=True)
-@bot.tree.command(name="birthdaych_list", description="このサーバーの誕生日通知チャンネルを表示します（管理者または許可ロール限定）")
+@bot.tree.command(name="beta_birthdaych_list", description="このサーバーの誕生日通知チャンネルを表示します（管理者または許可ロール限定）")
 async def birthdaych_list(interaction: discord.Interaction):
     try:
         member = await interaction.guild.fetch_member(interaction.user.id)
@@ -994,7 +994,7 @@ async def birthdaych_list(interaction: discord.Interaction):
     await interaction.response.send_message(message, ephemeral=True)
 
 # ホワイトリスト管理コマンド
-@bot.tree.command(name="add_whitelist", description="コマンド許可ロールを追加します")
+@bot.tree.command(name="beta_add_whitelist", description="コマンド許可ロールを追加します")
 @app_commands.describe(role="許可するロール")
 async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
     try:
@@ -1031,7 +1031,7 @@ async def add_whitelist(interaction: discord.Interaction, role: discord.Role):
         await interaction.response.send_message(f"{role.name} は既に許可ロールです", ephemeral=True)
 
 
-@bot.tree.command(name="delete_whitelist", description="許可ロールを削除します")
+@bot.tree.command(name="beta_delete_whitelist", description="許可ロールを削除します")
 @app_commands.describe(role="削除するロール")
 async def delete_whitelist(interaction: discord.Interaction, role: discord.Role):
     try:
@@ -1054,7 +1054,7 @@ async def delete_whitelist(interaction: discord.Interaction, role: discord.Role)
     else:
         await interaction.response.send_message(f"{role.name} は許可ロールではありません", ephemeral=True)
 
-@bot.tree.command(name="whitelist", description="許可ロールを表示します")
+@bot.tree.command(name="beta_whitelist", description="許可ロールを表示します")
 async def show_whitelist(interaction: discord.Interaction):
     try:
         member = await interaction.guild.fetch_member(interaction.user.id)
@@ -1076,7 +1076,7 @@ async def show_whitelist(interaction: discord.Interaction):
     await interaction.response.send_message("許可ロール:\n" + "\n".join(roles), ephemeral=True)
 
 # アナウンスチャンネル管理コマンド
-@bot.tree.command(name="add_announcement_list", description="自動アナウンス公開リストにチャンネルを追加します。")
+@bot.tree.command(name="beta_add_announcement_list", description="自動アナウンス公開リストにチャンネルを追加します。")
 @app_commands.describe(channel="追加するチャンネル")
 async def add_announcement_list(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
@@ -1096,7 +1096,7 @@ async def add_announcement_list(interaction: discord.Interaction, channel: disco
         await interaction.response.send_message(f"{channel.mention} は既に自動アナウンス公開リストにあります。", ephemeral=True)
 
 
-@bot.tree.command(name="delete_announcement_list", description="自動アナウンス公開リストからチャンネルを削除します。")
+@bot.tree.command(name="beta_delete_announcement_list", description="自動アナウンス公開リストからチャンネルを削除します。")
 @app_commands.describe(channel="削除するチャンネル")
 async def delete_announcement_list(interaction: discord.Interaction, channel: discord.TextChannel):
     if not await check_permissions(interaction):
@@ -1113,7 +1113,7 @@ async def delete_announcement_list(interaction: discord.Interaction, channel: di
     else:
         await interaction.response.send_message(f"{channel.mention} は自動アナウンス公開リストに含まれていません。", ephemeral=True)
 
-@bot.tree.command(name="announcement_list", description="自動アナウンス公開リストを表示します")
+@bot.tree.command(name="beta_announcement_list", description="自動アナウンス公開リストを表示します")
 async def announcement_list(interaction: discord.Interaction):
     if not await check_permissions(interaction):
         await interaction.response.send_message("このコマンドを実行する権限がありません", ephemeral=True)
@@ -1129,7 +1129,7 @@ async def announcement_list(interaction: discord.Interaction):
 
 
 # その他のコマンド
-@bot.tree.command(name="user_information", description="ユーザーの情報を表示します")
+@bot.tree.command(name="beta_user_information", description="ユーザーの情報を表示します")
 @app_commands.describe(user="情報を表示するユーザー")
 async def user_information(interaction: discord.Interaction, user: discord.Member):
     if not await check_permissions(interaction):
@@ -1145,7 +1145,7 @@ async def user_information(interaction: discord.Interaction, user: discord.Membe
     embed.add_field(name="最上位ロール", value=user.top_role.mention, inline=True)
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="server_information", description="サーバー情報を表示します。")
+@bot.tree.command(name="beta_server_information", description="サーバー情報を表示します。")
 async def server_information(interaction: discord.Interaction):
     guild = interaction.guild
     members = guild.members
@@ -1186,7 +1186,7 @@ async def server_information(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="message", description="指定したチャンネルにメッセージを送信します")
+@bot.tree.command(name="beta_message", description="指定したチャンネルにメッセージを送信します")
 @app_commands.describe(
     channel="送信先チャンネル",
     message="送信するメッセージ",
@@ -1203,7 +1203,7 @@ async def message(interaction: discord.Interaction, channel: discord.TextChannel
     await channel.send(message)
     await interaction.response.send_message("メッセージを送信しました", ephemeral=True)
 
-@bot.tree.command(name="delete_message", description="指定した数のメッセージを削除します")
+@bot.tree.command(name="beta_delete_message", description="指定した数のメッセージを削除します")
 @app_commands.describe(amount="削除するメッセージ数 (1-99)")
 async def delete_message(interaction: discord.Interaction, amount: int):
     if not await check_permissions(interaction):
@@ -1240,7 +1240,7 @@ async def support(interaction: discord.Interaction):
     embed.add_field(name="招待リンク", value="https://discord.gg/Yv9uJ32KkT")
     await interaction.response.send_message(embed=embed)
 
-@bot.tree.command(name="help", description="コマンド一覧を表示します")
+@bot.tree.command(name="beta_help", description="コマンド一覧を表示します")
 async def help(interaction: discord.Interaction):
     embed, view = build_help_embed_and_view_ephemeral()  # 非公開用の関数名に合わせてください
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
