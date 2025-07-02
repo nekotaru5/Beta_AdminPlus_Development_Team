@@ -774,7 +774,7 @@ async def updatech(interaction: discord.Interaction, channel: discord.TextChanne
 
     # ✅ コンソールログ出力
     print(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
-
+    await send_log(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
 
 @bot.tree.command(name="server_list", description="Botが参加しているサーバー一覧を表示（ページ付き）")
 async def server_list(interaction: discord.Interaction):
@@ -843,6 +843,7 @@ async def set_report_channel(interaction: discord.Interaction, channel: discord.
 
     # ログ出力
     print(f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
+    await send_log(f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
 
     await interaction.response.send_message(f"✅ 通報チャンネルを {channel.mention} に設定しました。", ephemeral=True)
 
