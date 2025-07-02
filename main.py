@@ -667,7 +667,7 @@ def build_update_embed_and_view_public():
 
 # ✅ !update（従来のプレフィックスコマンド）
 
-@bot.tree.context_menu(name="【Beta】メッセージを通報する")
+@bot.tree.context_menu(name="【beta】メッセージを通報する")
 async def report_message(interaction: discord.Interaction, message: discord.Message):
     guild_id = str(interaction.guild_id)
     report_channel_id = report_channels.get(guild_id)
@@ -716,7 +716,7 @@ async def help(ctx):
 
 # ✅ /update（新しいスラッシュコマンド）
 
-@bot.tree.command(name="update_message", description="すべてのアップデートチャンネルに一斉送信（ホワイトユーザーのみ）")
+@bot.tree.command(name="【beta】update_message", description="すべてのアップデートチャンネルに一斉送信（ホワイトユーザーのみ）")
 @app_commands.describe(message="送信する内容（改行・メンション可）")
 async def update_message(interaction: discord.Interaction, message: str):
     # ホワイトユーザー制限
@@ -788,7 +788,7 @@ async def server_list(interaction: discord.Interaction):
     )
 
 
-@bot.tree.command(name="dm", description="指定したユーザーにDMを送信します。")
+@bot.tree.command(name="【beta】dm", description="指定したユーザーにDMを送信します。")
 @app_commands.describe(user="DMを送る相手", message="送信するメッセージ")
 async def dm(interaction: discord.Interaction, user: discord.User, message: str):
     if not white_users:
