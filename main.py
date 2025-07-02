@@ -684,7 +684,7 @@ async def report_message(interaction: discord.Interaction, message: discord.Mess
     message_link = f"https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id}"
 
     embed = discord.Embed(
-        title="🚨 通報されました",
+        title="通報されました",
         color=discord.Color.red()
     )
     embed.add_field(name="通報者", value=f"`{interaction.user.name}`", inline=False)
