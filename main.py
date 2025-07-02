@@ -803,6 +803,21 @@ async def set_log_channel(interaction: discord.Interaction, channel: discord.Tex
         await send_log(bot, f"⚠️ [{guild_id}] で、[{channel.id}] にログチャンネルが上書きされました。")
         await interaction.response.send_message(f"⚠️ ログチャンネルを上書きしました： {channel.mention}", ephemeral=True)
 
+@bot.tree.command(name="set_report_channel", description="通報チャンネルを設定します（管理者または許可ロール限定）")
+async def set_report_channel(interaction: discord.Interaction, channel: discord.TextChannel):
+    if not await check_permissions(interaction):
+        await interaction.response.send_message("❌ このコマンドを実行する権限がありません。", ephemeral=True)
+        return
+
+    guild_id = str(interaction.guild_id)
+    report_channels[guild_id] = channel.id
+    save_report_channels()
+
+    # ログ出力
+    print(f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
+
+    await interaction.response.send_message(f"✅ 通報チャンネルを {channel.mention} に設定しました。", ephemeral=True)
+
 @bot.tree.command(name="update", description="アップデート履歴を表示します")
 async def slash_update(interaction: discord.Interaction):
     embed, view = build_update_embed_and_view_ephemeral()
