@@ -286,7 +286,8 @@ async def on_ready():
     birthday_channels = load_birthday_channels()
     log_channels = load_log_channels()
     white_users = load_white_users()
-    update_channels = load_update_channels()  # ← 追加！
+    update_channels = load_update_channels()
+    report_channels = load_report_channels() # ← 追加！
 
     if not check_birthdays.is_running():
         check_birthdays.start()
