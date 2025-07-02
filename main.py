@@ -774,7 +774,7 @@ async def updatech(interaction: discord.Interaction, channel: discord.TextChanne
 
     # ✅ コンソールログ出力
     print(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
-    await send_log(f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
+    await send_log(bot, f"[{guild_id}] で、[{channel.id}] にアップデートチャンネルが設定されました。")
 
 @bot.tree.command(name="server_list", description="Botが参加しているサーバー一覧を表示（ページ付き）")
 async def server_list(interaction: discord.Interaction):
@@ -843,7 +843,7 @@ async def set_report_channel(interaction: discord.Interaction, channel: discord.
 
     # ログ出力
     print(f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
-    await send_log(f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
+    await send_log(bot, f"[通報設定] サーバーID: {guild_id} にチャンネルID: {channel.id} を通報用チャンネルとして設定しました")
 
     await interaction.response.send_message(f"✅ 通報チャンネルを {channel.mention} に設定しました。", ephemeral=True)
 
@@ -882,7 +882,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
         save_birthday_channels()
         await interaction.response.send_message(f"{channel.mention} を誕生日アナウンスチャンネルから解除しました。", ephemeral=True)
         print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
-        await send_log(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
+        await send_log(bot, f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルから削除されました。")
         
     else:
         if existing_channel_id is not None:
@@ -890,7 +890,7 @@ async def set_birthday_channel(interaction: discord.Interaction, channel: discor
             await send_log(f"[{guild_id}] で誕生日アナウンスチャンネルを [{existing_channel_id}] から [{channel.id}] に上書きしました。")
         else:
             print(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
-            await send_log(f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
+            await send_log(bot, f"[{guild_id}] で [{channel.id}] が誕生日アナウンスチャンネルとして登録されました。")
 
         birthday_channels[guild_id] = channel.id
         save_birthday_channels()
@@ -913,7 +913,7 @@ async def add_birthdaylist(interaction: discord.Interaction, user: discord.User,
     save_birthday_list()
     await interaction.response.send_message(f"{user.mention} の誕生日を {birthday} に登録しました。", ephemeral=True)
     print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
-    await send_log(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
+    await send_log(bot, f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を {birthday} に登録しました。")
 
 @bot.tree.command(name="delete_birthdaylist", description="誕生日を削除します")
 @app_commands.describe(user="削除するユーザー")
@@ -927,7 +927,7 @@ async def delete_birthdaylist(interaction: discord.Interaction, user: discord.Us
         save_birthday_list()
         await interaction.response.send_message(f"{user.mention} の誕生日を削除しました。", ephemeral=True)
         print(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
-        await send_log(f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
+        await send_log(bot, f"[{interaction.guild_id}] でユーザーID {user.id} の誕生日を削除しました。")
     else:
         await interaction.response.send_message(f"{user.mention} は誕生日リストに登録されていません。", ephemeral=True)
 
@@ -1051,7 +1051,7 @@ async def delete_whitelist(interaction: discord.Interaction, role: discord.Role)
         allowed_roles[guild_id].remove(role.id)
         save_allowed_roles()
         print(f"[{guild_id}] でロール {role.id} が削除されました")
-        await send_log(f"[{guild_id}] でロール {role.id} が削除されました")  # ← ここ追加
+        await send_log(bot, f"[{guild_id}] でロール {role.id} が削除されました")  # ← ここ追加
         await interaction.response.send_message(f"{role.name} を許可ロールから削除しました", ephemeral=True)
     else:
         await interaction.response.send_message(f"{role.name} は許可ロールではありません", ephemeral=True)
@@ -1066,7 +1066,7 @@ async def show_whitelist(interaction: discord.Interaction):
     except Exception as e:
         await interaction.response.send_message("権限の確認中にエラーが発生しました", ephemeral=True)
         print(f"権限チェックエラー: {e}")
-        await send_log(f"権限チェックエラー: {e}")
+
         return
 
     guild_id = str(interaction.guild_id)
