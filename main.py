@@ -667,7 +667,7 @@ def build_update_embed_and_view_public():
 
 # ✅ !update（従来のプレフィックスコマンド）
 
-@bot.tree.context_menu(name="通報する")
+@bot.tree.context_menu(name="メッセージを通報する")
 async def report_message(interaction: discord.Interaction, message: discord.Message):
     guild_id = str(interaction.guild_id)
     report_channel_id = report_channels.get(guild_id)
